@@ -5,23 +5,51 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "context-janitor"
 version = "0.1.0"
-description = "A tiny CLI middleware that prunes large tool catalogs down to the few tools an agent actually needs."
+description = "Cost-saving CLI middleware for pruning oversized LLM agent tool catalogs."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Context Janitor contributors" }]
-keywords = ["agents", "llm", "tools", "cli", "middleware", "mcp"]
+keywords = [
+  "llm",
+  "agents",
+  "tools",
+  "tool-calling",
+  "cost-saving",
+  "openai",
+  "anthropic",
+  "gemini",
+  "ai-agents",
+  "middleware",
+  "cli",
+  "mcp",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
+  "Framework :: AsyncIO",
   "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Utilities",
+  "Typing :: Typed",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/context-janitor/context-janitor"
+Repository = "https://github.com/context-janitor/context-janitor"
+Issues = "https://github.com/context-janitor/context-janitor/issues"
+Documentation = "https://github.com/context-janitor/context-janitor#readme"
 
 [project.scripts]
 context-janitor = "context_janitor.cli:main"
@@ -29,3 +57,6 @@ janitor = "context_janitor.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+context_janitor = ["py.typed"]
