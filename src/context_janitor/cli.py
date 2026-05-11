@@ -65,6 +65,7 @@ def _prune(args: argparse.Namespace) -> int:
         config.cache,
         logger,
         config.price_per_million_tokens,
+        config.keep,
     )
     _log_metrics(logger, result)
     _write_output(result, tools, config, prompt, args.explain)
@@ -88,6 +89,7 @@ def _middleware(args: argparse.Namespace) -> int:
         config.cache,
         logger,
         config.price_per_million_tokens,
+        config.keep,
     )
     _log_metrics(logger, result)
     if args.dry_run:
@@ -199,6 +201,11 @@ def _add_common_options(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help="For middleware mode, log the pruning decision without modifying the request payload.",
     )
+    parser.add_argument(
+        "--keep",
+        default=None,
+        help="Comma-separated tool names that must remain in the selected set.",
+    )
 
 
 def _resolve_config(args: argparse.Namespace) -> JanitorConfig:
@@ -213,6 +220,7 @@ def _resolve_config(args: argparse.Namespace) -> JanitorConfig:
         "log_level": getattr(args, "log_level", None),
         "format": getattr(args, "format", None),
         "price_per_million_tokens": getattr(args, "price_per_million_tokens", None),
+        "keep": _parse_keep(getattr(args, "keep", None)),
     }
     return merge_config(config, overrides)
 
@@ -279,6 +287,12 @@ def _write_explain_stderr(prompt: str, tools: list[Any], limit: int) -> None:
             f"[Janitor] EXPLAIN {status} {item['name']} score={item['score']} matched={terms}",
             file=sys.stderr,
         )
+
+
+def _parse_keep(value: str | None) -> tuple[str, ...] | None:
+    if value is None:
+        return None
+    return tuple(part.strip() for part in value.split(",") if part.strip())
 
 
 def _prompt_from_messages(messages: list[dict[str, Any]]) -> str:

@@ -45,6 +45,18 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+]
+dev = [
+  "pytest",
+  "pytest-asyncio",
+  "ruff",
+  "mypy",
+]
+
 [project.urls]
 Homepage = "https://github.com/context-janitor/context-janitor"
 Repository = "https://github.com/context-janitor/context-janitor"

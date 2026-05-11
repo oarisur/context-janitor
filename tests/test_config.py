@@ -19,6 +19,7 @@ class ConfigTest(unittest.TestCase):
                         "cache: true",
                         "timeout_ms: 700",
                         "log_level: INFO",
+                        "keep: log_error,notify_admin",
                     ]
                 ),
                 encoding="utf-8",
@@ -32,6 +33,7 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(config.cache)
         self.assertEqual(config.timeout_ms, 700)
         self.assertEqual(config.log_level, "INFO")
+        self.assertEqual(config.keep, ("log_error", "notify_admin"))
 
 
 if __name__ == "__main__":

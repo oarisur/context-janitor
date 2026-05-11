@@ -16,6 +16,7 @@ class JanitorConfig:
     log_level: str = "WARNING"
     format: str = "json"
     price_per_million_tokens: float = 5.0
+    keep: tuple[str, ...] = ()
 
 
 DEFAULT_CONFIG = JanitorConfig()
@@ -38,6 +39,7 @@ def load_config(start: Path | None = None, explicit_path: str | None = None) -> 
         price_per_million_tokens=float(
             values.get("price_per_million_tokens", DEFAULT_CONFIG.price_per_million_tokens)
         ),
+        keep=_tuple(values.get("keep", DEFAULT_CONFIG.keep)),
     )
 
 
@@ -104,3 +106,11 @@ def _bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).lower() in {"1", "true", "yes", "on"}
+
+
+def _tuple(value: Any) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, (list, tuple)):
+        return tuple(str(item).strip() for item in value if str(item).strip())
+    return tuple(part.strip() for part in str(value).split(",") if part.strip())

@@ -28,6 +28,23 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual(result.provider, "heuristic")
         self.assertEqual(result.selected[0].name, "web_search")
 
+    def test_keep_forces_required_tools_into_selection(self):
+        tools = [
+            Tool("web_search", "Search the public web."),
+            Tool("calendar_create", "Create calendar events."),
+            Tool("log_error", "Record safety and error telemetry."),
+        ]
+
+        result = select_resilient(
+            provider="heuristic",
+            prompt="Search the web",
+            tools=tools,
+            limit=2,
+            keep=("log_error",),
+        )
+
+        self.assertEqual([tool.name for tool in result.selected], ["log_error", "web_search"])
+
 
 if __name__ == "__main__":
     unittest.main()

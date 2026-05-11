@@ -12,6 +12,9 @@ It is built for agent stacks where sending every available tool is expensive, sl
 If an API router fails, Context Janitor falls back to a local heuristic so your pipeline keeps
 moving.
 
+It is MCP-compatible by design: MCP servers expose structured tool definitions, and Context
+Janitor can sit between those JSON tool catalogs and your agent runtime.
+
 ## Benchmark Snapshot
 
 ```text
@@ -110,6 +113,7 @@ fallback: heuristic
 cache: true
 timeout_ms: 800
 log_level: INFO
+keep: log_error,notify_admin
 ```
 
 Then run:
@@ -119,6 +123,18 @@ Get-Content request.json | janitor middleware
 ```
 
 CLI flags override config values.
+
+## Required Tools
+
+Some production agents have safety, audit, or notification tools that must always remain available.
+Use `--keep` to force those tools into the selected set:
+
+```powershell
+janitor prune --prompt "Search the web" --tools tools.json --limit 5 --keep log_error,notify_admin
+```
+
+Kept tools reserve slots inside the limit, then Janitor fills the remaining slots with the best
+ranked matches.
 
 ## Middleware Mode
 
@@ -191,6 +207,7 @@ result = select_resilient(
     tools=tools,
     limit=5,
     cache_enabled=True,
+    keep=("log_error", "notify_admin"),
 )
 
 selected_tools = result.selected

@@ -35,12 +35,15 @@ def select_resilient(
     cache_enabled: bool = False,
     logger: logging.Logger | None = None,
     price_per_million_tokens: float = 5.0,
+    keep: tuple[str, ...] | list[str] = (),
 ) -> SelectionResult:
     logger = logger or logging.getLogger("context_janitor")
     started = perf_counter()
     requested_provider = provider
 
-    if cache_enabled:
+    keep_names = tuple(name for name in keep if name)
+
+    if cache_enabled and not keep_names:
         cache_entry = get_cached_selection(prompt, tools, provider, model, limit)
         cached = _tools_by_names(cache_entry.names if cache_entry else [], tools, limit)
         if cached:
@@ -75,7 +78,9 @@ def select_resilient(
         actual_provider = "heuristic"
         fallback_used = True
 
-    if cache_enabled:
+    selected = _apply_keep(selected, tools, keep_names, limit)
+
+    if cache_enabled and not keep_names:
         try:
             store_selection(prompt, tools, selected, provider, model, limit)
         except OSError as error:
@@ -108,6 +113,17 @@ def _tools_by_names(names: list[str], tools: list[Tool], limit: int) -> list[Too
         if len(selected) == limit:
             break
     return selected
+
+
+def _apply_keep(selected: list[Tool], tools: list[Tool], keep_names: tuple[str, ...], limit: int) -> list[Tool]:
+    if not keep_names:
+        return selected[:limit]
+
+    by_name = {tool.name: tool for tool in tools}
+    kept = [by_name[name] for name in keep_names if name in by_name]
+    kept_names = {tool.name for tool in kept}
+    merged = kept + [tool for tool in selected if tool.name not in kept_names]
+    return merged[:limit]
 
 
 def _elapsed_ms(started: float) -> int:

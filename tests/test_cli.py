@@ -220,6 +220,47 @@ class CliTest(unittest.TestCase):
         self.assertEqual(len(payload["tools"]), 2)
         self.assertIn("event=dry_run", result.stderr)
 
+    def test_cli_keep_forces_required_tool(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tools_path = Path(temp_dir) / "tools.json"
+            tools_path.write_text(
+                json.dumps(
+                    [
+                        {"name": "web_search", "description": "Search the public web."},
+                        {"name": "calendar_create", "description": "Create calendar events."},
+                        {"name": "log_error", "description": "Record safety telemetry."},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "prune",
+                    "--prompt",
+                    "Search the web",
+                    "--tools",
+                    str(tools_path),
+                    "--limit",
+                    "2",
+                    "--keep",
+                    "log_error",
+                    "--format",
+                    "names",
+                ],
+                check=True,
+                capture_output=True,
+                env=_env(),
+                text=True,
+            )
+
+        self.assertEqual(result.stdout.strip().splitlines(), ["log_error", "web_search"])
+
 
 def _env() -> dict[str, str]:
     env = os.environ.copy()
