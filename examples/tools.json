@@ -1,0 +1,34 @@
+[
+  {
+    "name": "github_search_issues",
+    "description": "Search issues in a GitHub repository by text, label, state, or assignee."
+  },
+  {
+    "name": "github_create_pr",
+    "description": "Open a pull request with a title, body, source branch, and target branch."
+  },
+  {
+    "name": "calendar_create_event",
+    "description": "Create a calendar event with attendees, time, location, and notes."
+  },
+  {
+    "name": "gmail_send_email",
+    "description": "Send an email message to one or more recipients."
+  },
+  {
+    "name": "web_search",
+    "description": "Search the public web for current information and source links."
+  },
+  {
+    "name": "pdf_extract_text",
+    "description": "Extract text from PDF files and return page-level content."
+  },
+  {
+    "name": "stripe_create_checkout",
+    "description": "Create a Stripe Checkout Session for accepting a payment."
+  },
+  {
+    "name": "postgres_query",
+    "description": "Run a SQL query against a Postgres database."
+  }
+]

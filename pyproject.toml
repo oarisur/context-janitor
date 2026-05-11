@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "context-janitor"
+version = "0.1.0"
+description = "A tiny CLI middleware that prunes large tool catalogs down to the few tools an agent actually needs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Context Janitor contributors" }]
+keywords = ["agents", "llm", "tools", "cli", "middleware", "mcp"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.scripts]
+context-janitor = "context_janitor.cli:main"
+janitor = "context_janitor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
