@@ -1,0 +1,8 @@
+provider: anthropic
+model: claude-3-haiku-20240307
+limit: 5
+fallback: heuristic
+cache: true
+timeout_ms: 800
+log_level: INFO
+price_per_million_tokens: 5.00

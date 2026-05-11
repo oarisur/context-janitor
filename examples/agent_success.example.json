@@ -1,0 +1,7 @@
+{
+  "baseline": 0.85,
+  "heuristic": 0.99,
+  "openai": 0.99,
+  "anthropic": 0.98,
+  "gemini": 0.98
+}

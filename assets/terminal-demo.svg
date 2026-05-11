@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="460" viewBox="0 0 920 460" role="img" aria-label="Context Janitor terminal demo">
+  <rect width="920" height="460" rx="14" fill="#111827"/>
+  <rect y="0" width="920" height="42" rx="14" fill="#1f2937"/>
+  <circle cx="24" cy="21" r="6" fill="#ef4444"/>
+  <circle cx="46" cy="21" r="6" fill="#f59e0b"/>
+  <circle cx="68" cy="21" r="6" fill="#10b981"/>
+  <text x="28" y="86" fill="#e5e7eb" font-family="Consolas, monospace" font-size="20">$ janitor prune --prompt "Search GitHub issues and make a PR" --tools tools.json --limit 2 --log-level INFO</text>
+  <text x="28" y="130" fill="#38bdf8" font-family="Consolas, monospace" font-size="20">[Janitor] INFO event=pruned provider=heuristic fallback=false cache_hit=false</text>
+  <text x="28" y="164" fill="#38bdf8" font-family="Consolas, monospace" font-size="20">[Janitor] INFO tools_before=50 tools_after=5 tokens_saved=8500 estimated_savings_usd=0.042500</text>
+  <text x="28" y="220" fill="#f9fafb" font-family="Consolas, monospace" font-size="20">{</text>
+  <text x="54" y="254" fill="#f9fafb" font-family="Consolas, monospace" font-size="20">"selected": ["github_search_issues", "github_create_pr"],</text>
+  <text x="54" y="288" fill="#f9fafb" font-family="Consolas, monospace" font-size="20">"metadata": { "reduced_tokens": 8500, "cache_hit": false }</text>
+  <text x="28" y="322" fill="#f9fafb" font-family="Consolas, monospace" font-size="20">}</text>
+</svg>

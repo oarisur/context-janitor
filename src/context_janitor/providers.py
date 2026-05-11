@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import socket
 import urllib.error
 import urllib.request
 from typing import Any
@@ -21,23 +22,30 @@ def select_with_provider(
     tools: list[Tool],
     limit: int,
     model: str | None = None,
+    timeout_seconds: float = 0.8,
 ) -> list[Tool]:
     provider = provider.lower()
     if provider == "heuristic":
         return select_tools(prompt, tools, limit)
     if provider == "openai":
-        names = _select_openai(prompt, tools, limit, model)
+        names = _select_openai(prompt, tools, limit, model, timeout_seconds)
     elif provider == "anthropic":
-        names = _select_anthropic(prompt, tools, limit, model)
+        names = _select_anthropic(prompt, tools, limit, model, timeout_seconds)
     elif provider == "gemini":
-        names = _select_gemini(prompt, tools, limit, model)
+        names = _select_gemini(prompt, tools, limit, model, timeout_seconds)
     else:
         raise ProviderError(f"Unknown provider '{provider}'.")
 
-    return _tools_by_names(names, tools, limit)
+    return _tools_by_names(names, tools, limit) or select_tools(prompt, tools, limit)
 
 
-def _select_openai(prompt: str, tools: list[Tool], limit: int, model: str | None) -> list[str]:
+def _select_openai(
+    prompt: str,
+    tools: list[Tool],
+    limit: int,
+    model: str | None,
+    timeout_seconds: float,
+) -> list[str]:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise ProviderError("OPENAI_API_KEY is required for --provider openai.")
@@ -56,11 +64,18 @@ def _select_openai(prompt: str, tools: list[Tool], limit: int, model: str | None
         "https://api.openai.com/v1/chat/completions",
         body,
         {"Authorization": f"Bearer {api_key}"},
+        timeout_seconds,
     )
     return _extract_names(response["choices"][0]["message"]["content"])
 
 
-def _select_anthropic(prompt: str, tools: list[Tool], limit: int, model: str | None) -> list[str]:
+def _select_anthropic(
+    prompt: str,
+    tools: list[Tool],
+    limit: int,
+    model: str | None,
+    timeout_seconds: float,
+) -> list[str]:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         raise ProviderError("ANTHROPIC_API_KEY is required for --provider anthropic.")
@@ -81,12 +96,19 @@ def _select_anthropic(prompt: str, tools: list[Tool], limit: int, model: str | N
             "x-api-key": api_key,
             "anthropic-version": "2023-06-01",
         },
+        timeout_seconds,
     )
     text = "\n".join(block.get("text", "") for block in response.get("content", []))
     return _extract_names(text)
 
 
-def _select_gemini(prompt: str, tools: list[Tool], limit: int, model: str | None) -> list[str]:
+def _select_gemini(
+    prompt: str,
+    tools: list[Tool],
+    limit: int,
+    model: str | None,
+    timeout_seconds: float,
+) -> list[str]:
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         raise ProviderError("GEMINI_API_KEY or GOOGLE_API_KEY is required for --provider gemini.")
@@ -103,7 +125,7 @@ def _select_gemini(prompt: str, tools: list[Tool], limit: int, model: str | None
             }
         ],
     }
-    response = _post_json(url, body, {})
+    response = _post_json(url, body, {}, timeout_seconds)
     candidates = response.get("candidates", [])
     text = ""
     if candidates:
@@ -112,7 +134,12 @@ def _select_gemini(prompt: str, tools: list[Tool], limit: int, model: str | None
     return _extract_names(text)
 
 
-def _post_json(url: str, body: dict[str, Any], headers: dict[str, str]) -> dict[str, Any]:
+def _post_json(
+    url: str,
+    body: dict[str, Any],
+    headers: dict[str, str],
+    timeout_seconds: float,
+) -> dict[str, Any]:
     request = urllib.request.Request(
         url,
         data=json.dumps(body).encode("utf-8"),
@@ -123,13 +150,17 @@ def _post_json(url: str, body: dict[str, Any], headers: dict[str, str]) -> dict[
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as error:
         message = error.read().decode("utf-8", errors="replace")
         raise ProviderError(f"Provider request failed with HTTP {error.code}: {message}") from error
     except urllib.error.URLError as error:
         raise ProviderError(f"Provider request failed: {error.reason}") from error
+    except TimeoutError as error:
+        raise ProviderError(f"Provider request timed out after {timeout_seconds:.2f}s") from error
+    except socket.timeout as error:
+        raise ProviderError(f"Provider request timed out after {timeout_seconds:.2f}s") from error
 
 
 def _system_prompt(limit: int) -> str:
@@ -182,4 +213,4 @@ def _tools_by_names(names: list[str], tools: list[Tool], limit: int) -> list[Too
             selected.append(tool)
         if len(selected) == limit:
             break
-    return selected or select_tools(" ".join(names), tools, limit)
+    return selected
