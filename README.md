@@ -563,6 +563,7 @@ and track the resulting accuracy alongside downstream agent success.
 ## Recipes
 
 - [LangChain / LangGraph](recipes/langchain-langgraph.md)
+- [MCP Tool Proxy](recipes/mcp-proxy.md)
 - [CrewAI](recipes/crewai.md)
 - [Vercel AI SDK](recipes/vercel-ai-sdk.md)
 - [GitHub Actions](recipes/github-actions.md)
