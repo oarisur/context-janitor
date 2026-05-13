@@ -1,0 +1,59 @@
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful enterprise AI assistant with access to various internal tools."
+    },
+    {
+      "role": "user",
+      "content": "Can you check the postgres database for yesterday's revenue and send a summary message to the marketing Slack channel?"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "postgres_query",
+        "description": "Run a read-only SQL query against the production postgres database to fetch revenue, user, or sales data."
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "slack_send_message",
+        "description": "Send a formatted message to a specific Slack channel or user."
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "github_create_pr",
+        "description": "Open a new pull request on GitHub."
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "calendar_create_event",
+        "description": "Schedule a meeting on the corporate calendar."
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "stripe_refund_payment",
+        "description": "Issue a full or partial refund to a customer via Stripe."
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "aws_restart_ec2",
+        "description": "Restart an Amazon EC2 server instance by ID."
+      }
+    }
+  ],
+  "temperature": 0.2,
+  "tool_choice": "auto"
+}
