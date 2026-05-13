@@ -26,11 +26,16 @@ def main() -> int:
     parser.add_argument("--openai-model")
     parser.add_argument("--anthropic-model")
     parser.add_argument("--gemini-model")
+    parser.add_argument(
+        "--agent-success-file",
+        help="Optional JSON map of measured agent success rates by provider.",
+    )
     parser.add_argument("--format", choices=["table", "json"], default="table")
     args = parser.parse_args()
 
     tools = load_tools(_read_json(args.tools))
     cases = _read_cases(args.evals)
+    agent_success = _read_agent_success(args.agent_success_file)
     rows = [
         _evaluate_provider(
             provider,
@@ -40,6 +45,7 @@ def main() -> int:
             args.limit,
             args.timeout_ms,
             args.fallback,
+            agent_success,
         )
         for provider in args.providers
     ]
@@ -60,11 +66,12 @@ def _evaluate_provider(
     limit: int,
     timeout_ms: int,
     fallback: str,
+    agent_success: dict[str, Any],
 ) -> dict[str, Any]:
     if provider != "heuristic" and not _has_key(provider):
-        return _skipped_row(provider, len(cases), "missing API key")
+        return _skipped_row(provider, len(cases), "missing API key", agent_success)
     if provider != "heuristic" and not model:
-        return _skipped_row(provider, len(cases), "missing model")
+        return _skipped_row(provider, len(cases), "missing model", agent_success)
 
     correct = 0
     fallbacks = 0
@@ -98,18 +105,27 @@ def _evaluate_provider(
         "cases": len(cases),
         "correct": correct,
         "accuracy": correct / len(cases) if cases else 0,
+        "agent_success": _agent_success(agent_success, provider),
+        "distraction_delta": _distraction_delta(agent_success, provider),
         "fallbacks": fallbacks,
         "misses": misses,
         "status": "ok",
     }
 
 
-def _skipped_row(provider: str, cases: int, reason: str) -> dict[str, Any]:
+def _skipped_row(
+    provider: str,
+    cases: int,
+    reason: str,
+    agent_success: dict[str, Any],
+) -> dict[str, Any]:
     return {
         "provider": provider,
         "cases": cases,
         "correct": 0,
         "accuracy": None,
+        "agent_success": _agent_success(agent_success, provider),
+        "distraction_delta": _distraction_delta(agent_success, provider),
         "fallbacks": 0,
         "misses": [],
         "status": f"skipped: {reason}",
@@ -192,15 +208,59 @@ def _has_key(provider: str) -> bool:
     }.get(provider, True)
 
 
+def _read_agent_success(path: str | None) -> dict[str, Any]:
+    if not path:
+        return {}
+    payload = _read_json(path)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _agent_success(values: dict[str, Any], provider: str) -> float | None:
+    value = values.get(provider)
+    if value is None:
+        return None
+    return float(value)
+
+
+def _distraction_delta(values: dict[str, Any], provider: str) -> float | None:
+    baseline = values.get("baseline")
+    provider_success = values.get(provider)
+    if baseline is None or provider_success is None:
+        return None
+    return float(provider_success) - float(baseline)
+
+
 def _print_table(rows: list[dict[str, Any]]) -> None:
-    headers = ["Provider", "Cases", "Correct", "Accuracy", "Fallbacks", "Status", "Misses"]
-    keys = ["provider", "cases", "correct", "accuracy", "fallbacks", "status", "misses"]
+    headers = [
+        "Provider",
+        "Cases",
+        "Correct",
+        "Accuracy",
+        "Agent success",
+        "Distraction Delta",
+        "Fallbacks",
+        "Status",
+        "Misses",
+    ]
+    keys = [
+        "provider",
+        "cases",
+        "correct",
+        "accuracy",
+        "agent_success",
+        "distraction_delta",
+        "fallbacks",
+        "status",
+        "misses",
+    ]
     display_rows = []
     for row in rows:
         display_rows.append(
             {
                 **row,
                 "accuracy": "-" if row["accuracy"] is None else f"{row['accuracy']:.1%}",
+                "agent_success": _format_percent(row["agent_success"]),
+                "distraction_delta": _format_delta(row["distraction_delta"]),
                 "misses": _miss_summary(row["misses"]),
             }
         )
@@ -215,6 +275,17 @@ def _print_table(rows: list[dict[str, Any]]) -> None:
     for row in display_rows:
         print("| " + " | ".join(str(row[key]).ljust(width) for key, width in zip(keys, widths)) + " |")
     print(divider)
+
+
+def _format_percent(value: float | None) -> str:
+    return "-" if value is None else f"{value:.1%}"
+
+
+def _format_delta(value: float | None) -> str:
+    if value is None:
+        return "-"
+    sign = "+" if value >= 0 else ""
+    return f"{sign}{value:.1%}"
 
 
 def _miss_summary(misses: list[dict[str, Any]]) -> str:

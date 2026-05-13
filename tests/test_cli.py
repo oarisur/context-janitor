@@ -261,6 +261,68 @@ class CliTest(unittest.TestCase):
 
         self.assertEqual(result.stdout.strip().splitlines(), ["log_error", "web_search"])
 
+    def test_lint_reports_catalog_warnings(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tools_path = Path(temp_dir) / "tools.json"
+            tools_path.write_text(
+                json.dumps(
+                    [
+                        {"name": "web_search", "description": ""},
+                        {"name": "web_search", "description": "Search the public web."},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "lint",
+                    "--tools",
+                    str(tools_path),
+                    "--format",
+                    "json",
+                ],
+                check=True,
+                capture_output=True,
+                env=_env(),
+                text=True,
+            )
+
+        payload = json.loads(result.stdout)
+        self.assertFalse(payload["ok"])
+        self.assertIn("duplicate tool name", "\n".join(payload["warnings"]))
+        self.assertIn("empty description", "\n".join(payload["warnings"]))
+
+    def test_clear_cache_removes_cache_file(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / "cache.json"
+            cache_path.write_text("{}", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "clear-cache",
+                    "--cache-path",
+                    str(cache_path),
+                ],
+                check=True,
+                capture_output=True,
+                env=_env(),
+                text=True,
+            )
+
+            self.assertIn("cleared cache", result.stdout)
+            self.assertFalse(cache_path.exists())
+
 
 def _env() -> dict[str, str]:
     env = os.environ.copy()

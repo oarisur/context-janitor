@@ -21,6 +21,14 @@ def default_cache_path() -> Path:
     return Path.home() / ".janitor_cache" / "cache.json"
 
 
+def clear_cache(cache_path: Path | None = None) -> bool:
+    path = cache_path or default_cache_path()
+    if not path.exists():
+        return False
+    path.unlink()
+    return True
+
+
 def get_cached_selection(
     prompt: str,
     tools: list[Tool],

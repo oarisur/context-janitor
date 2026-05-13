@@ -255,9 +255,20 @@ The local selector is not just a keyword set. It is a compact TF-IDF-style ranke
 - Tokenizes the prompt and each tool's `name + description`
 - Splits names like `github_search_issues` into useful terms
 - Removes common stop words
+- Expands common intent aliases like `meeting -> calendar event`
 - Scores term frequency in the tool text
 - Weighs rare terms more heavily with inverse document frequency
 - Adds a small bonus for longer substring matches
+
+```mermaid
+flowchart LR
+  A["User prompt"] --> B["Tokenize and expand aliases"]
+  C["Tool catalog"] --> D["Tokenize names and descriptions"]
+  B --> E["Score prompt terms against each tool"]
+  D --> E
+  E --> F["Boost rare, specific matches"]
+  F --> G["Return top N tools"]
+```
 
 Distinctive terms like `stripe`, `github`, `postgres`, or `pdf` usually beat generic words like
 `create`, `get`, or `send`.
@@ -331,6 +342,12 @@ Cache file:
 The cache stores selections by prompt, provider, model, limit, and catalog hash. It can also reuse
 highly similar prompts. If the cache cannot be read or written, Janitor ignores the cache and keeps
 running.
+
+Clear the local cache while iterating on prompts or tool descriptions:
+
+```powershell
+janitor clear-cache
+```
 
 ## Explain Mode
 
@@ -406,6 +423,25 @@ janitor middleware [options] < request.json
 
 Most options match `prune`. `middleware` also supports `--dry-run`.
 
+### `janitor lint`
+
+Validate a tool catalog and report quality warnings before using it in production:
+
+```text
+janitor lint --tools tools.json
+```
+
+The linter checks the catalog shape, duplicate names, empty descriptions, and very short
+descriptions.
+
+### `janitor clear-cache`
+
+Delete the local semantic-selection cache:
+
+```text
+janitor clear-cache
+```
+
 ## Python API
 
 Synchronous API:
@@ -476,6 +512,9 @@ Useful benchmark options:
 | `--payload-price-per-million` | `5.0` | Main model tool payload price estimate |
 | `--agent-success-file` | none | JSON map of measured agent success rates |
 
+Model pricing moves quickly, so treat the defaults as placeholders and set these values to your
+current provider prices when calculating ROI.
+
 Example agent success file:
 
 ```json
@@ -495,6 +534,15 @@ bundled synthetic benchmark:
 ```powershell
 python scripts\evaluate.py --tools examples\tools.json --evals examples\evals.example.json --providers heuristic --limit 2
 ```
+
+To report the production-facing `Distraction Delta`, pass measured agent success rates:
+
+```powershell
+python scripts\evaluate.py --tools examples\tools.json --evals examples\evals.example.json --providers heuristic --limit 2 --agent-success-file examples\agent_success.example.json
+```
+
+`Distraction Delta` is `Success_with_Janitor - Success_baseline`, which helps separate "the right
+tool was present" from "the agent actually completed the task more often."
 
 Eval files may be JSON or JSONL. Each case needs a `prompt` and one of `expected_tool`,
 `expected_tools`, or `expected`:
@@ -542,7 +590,14 @@ pip install -e ".[dev]"
 Run tests:
 
 ```powershell
-python -m unittest discover -s tests
+python -m pytest
+```
+
+Run lint and type checks:
+
+```powershell
+python -m ruff check .
+python -m mypy src scripts
 ```
 
 Validate package metadata:

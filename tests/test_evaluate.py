@@ -22,6 +22,8 @@ class EvaluateTest(unittest.TestCase):
                 "heuristic",
                 "--limit",
                 "2",
+                "--agent-success-file",
+                "examples/agent_success.example.json",
                 "--format",
                 "json",
             ],
@@ -35,6 +37,8 @@ class EvaluateTest(unittest.TestCase):
         self.assertEqual(payload["cases"], 8)
         self.assertEqual(payload["results"][0]["provider"], "heuristic")
         self.assertGreaterEqual(payload["results"][0]["accuracy"], 0.75)
+        self.assertAlmostEqual(payload["results"][0]["agent_success"], 0.99)
+        self.assertAlmostEqual(payload["results"][0]["distraction_delta"], 0.14)
 
     def test_evaluate_accepts_jsonl_cases(self):
         root = Path(__file__).resolve().parents[1]

@@ -4,8 +4,11 @@ import argparse
 import json
 import logging
 import sys
+from collections import Counter
+from pathlib import Path
 from typing import Any
 
+from .cache import clear_cache, default_cache_path
 from .config import JanitorConfig, load_config, merge_config
 from .models import load_tools, raw_tools
 from .providers import ProviderError
@@ -44,6 +47,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     middleware.set_defaults(func=_middleware)
 
+    lint = subparsers.add_parser("lint", help="Validate a tool catalog and report quality warnings.")
+    lint.add_argument("--tools", required=True, help="Path to a JSON tool catalog.")
+    lint.add_argument("--format", choices=["text", "json"], default="text")
+    lint.set_defaults(func=_lint)
+
+    cache = subparsers.add_parser("clear-cache", help="Delete the local selection cache.")
+    cache.add_argument("--cache-path", help="Optional cache file path. Defaults to ~/.janitor_cache/cache.json.")
+    cache.set_defaults(func=_clear_cache)
+
     args = parser.parse_args(argv)
     try:
         return args.func(args)
@@ -74,6 +86,41 @@ def _prune(args: argparse.Namespace) -> int:
     )
     _log_metrics(logger, result)
     _write_output(result, tools, config, prompt, args.explain)
+    return 0
+
+
+def _lint(args: argparse.Namespace) -> int:
+    with open(args.tools, encoding="utf-8") as handle:
+        tools = load_tools(json.load(handle))
+
+    warnings = _lint_warnings(tools)
+    payload = {
+        "tools": len(tools),
+        "warnings": warnings,
+        "ok": not warnings,
+    }
+
+    if args.format == "json":
+        json.dump(payload, sys.stdout, indent=2)
+        sys.stdout.write("\n")
+        return 0
+
+    print(f"tools: {len(tools)}")
+    if not warnings:
+        print("ok: no lint warnings")
+        return 0
+    for warning in warnings:
+        print(f"warning: {warning}")
+    return 0
+
+
+def _clear_cache(args: argparse.Namespace) -> int:
+    path = Path(args.cache_path) if args.cache_path else default_cache_path()
+    removed = clear_cache(path)
+    if removed:
+        print(f"cleared cache: {path}")
+    else:
+        print(f"cache already empty: {path}")
     return 0
 
 
@@ -264,6 +311,24 @@ def _log_dry_run(logger: logging.Logger, tools: list[Any], result: SelectionResu
         [tool.name for tool in result.selected],
         pruned_names,
     )
+
+
+def _lint_warnings(tools: list[Any]) -> list[str]:
+    warnings = []
+    if not tools:
+        warnings.append("catalog contains no tools")
+
+    names = [tool.name for tool in tools]
+    for name, count in sorted(Counter(names).items()):
+        if count > 1:
+            warnings.append(f"duplicate tool name '{name}' appears {count} times")
+
+    for tool in tools:
+        if not tool.description.strip():
+            warnings.append(f"tool '{tool.name}' has an empty description")
+        elif len(tool.description.strip()) < 12:
+            warnings.append(f"tool '{tool.name}' has a very short description")
+    return warnings
 
 
 def _explain_payload(prompt: str, tools: list[Any], limit: int) -> list[dict[str, Any]]:
