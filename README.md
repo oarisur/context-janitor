@@ -675,9 +675,16 @@ Build distributable artifacts:
 python -m build
 ```
 
+Run the full release gate:
+
+```powershell
+python scripts\release_check.py
+```
+
 ## Release Checklist
 
 - Confirm `version = "0.1.0"` in [pyproject.toml](pyproject.toml).
+- Run [Release Checklist](docs/release-checklist.md).
 - Create a matching GitHub release tag, for example `v0.1.0`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
