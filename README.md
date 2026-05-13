@@ -627,6 +627,20 @@ python scripts\eval_agent.py --tools examples\tools.json --evals examples\evals.
 For a local model or real agent, replace the command after `--` with your runner. The runner can
 call Ollama, llama.cpp, a LangGraph app, or any process that accepts the JSON payload on stdin.
 
+### Ollama Smoke Test
+
+The repository includes a small local-model example that prunes a noisy 21-tool catalog before
+sending the remaining tool definitions to Ollama:
+
+```powershell
+pip install ollama
+python examples\ollama_agent.py
+```
+
+Small local models sometimes return tool calls as plain text or fenced JSON instead of native tool
+calls. The example handles all three shapes so you can confirm the pruned catalog is still usable
+before wiring Janitor into a larger agent loop.
+
 For thresholded rollout gates, see [Production Rollout](docs/production-rollout.md).
 
 To draft a real eval pack from agent logs:
