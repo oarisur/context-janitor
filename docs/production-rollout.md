@@ -94,8 +94,15 @@ Run catalog lint before shipping tool description changes:
 janitor lint --tools production-tools.json
 ```
 
-Fix duplicate names, empty descriptions, and overly vague tool descriptions. Good descriptions are
-part of the ranking surface.
+Fix duplicate names, empty descriptions, overly vague tool names, repeated descriptions, malformed
+schemas, and very long descriptions. Good names and descriptions are part of the ranking surface.
+
+If results look stale while you are editing tool descriptions, inspect or clear the cache:
+
+```powershell
+janitor cache-info
+janitor clear-cache
+```
 
 ## 5. Roll Out Gradually
 

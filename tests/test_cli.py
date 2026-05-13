@@ -298,6 +298,83 @@ class CliTest(unittest.TestCase):
         self.assertIn("duplicate tool name", "\n".join(payload["warnings"]))
         self.assertIn("empty description", "\n".join(payload["warnings"]))
 
+    def test_lint_reports_schema_and_ranking_warnings(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tools_path = Path(temp_dir) / "tools.json"
+            tools_path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": "run",
+                                "description": "Run anything.",
+                            },
+                        },
+                        {
+                            "name": "execute_tool",
+                            "description": "Do a generic operation for users.",
+                            "inputSchema": "not-an-object",
+                        },
+                        {
+                            "name": "first",
+                            "description": "Repeated description with no distinctive nouns.",
+                        },
+                        {
+                            "name": "second",
+                            "description": "Repeated description with no distinctive nouns.",
+                        },
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "lint",
+                    "--tools",
+                    str(tools_path),
+                    "--format",
+                    "json",
+                ],
+                check=True,
+                capture_output=True,
+                env=_env(),
+                text=True,
+            )
+
+        warnings = "\n".join(json.loads(result.stdout)["warnings"])
+        self.assertIn("generic name", warnings)
+        self.assertIn("missing parameters", warnings)
+        self.assertIn("inputSchema must be an object", warnings)
+        self.assertIn("description reused", warnings)
+
+    def test_lint_example_catalog_is_clean(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "context_janitor.cli",
+                "lint",
+                "--tools",
+                "examples/tools.json",
+                "--format",
+                "json",
+            ],
+            check=True,
+            capture_output=True,
+            cwd=Path(__file__).resolve().parents[1],
+            env=_env(),
+            text=True,
+        )
+
+        self.assertTrue(json.loads(result.stdout)["ok"])
+
     def test_clear_cache_removes_cache_file(self):
         import tempfile
 
@@ -322,6 +399,57 @@ class CliTest(unittest.TestCase):
 
             self.assertIn("cleared cache", result.stdout)
             self.assertFalse(cache_path.exists())
+
+    def test_cache_info_reports_cache_metadata(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / "cache.json"
+            cache_path.write_text(
+                json.dumps(
+                    {
+                        "abc": {
+                            "provider": "heuristic",
+                            "model": None,
+                            "limit": 2,
+                            "names": ["web_search"],
+                            "created_at": 123,
+                        },
+                        "def": {
+                            "provider": "openai",
+                            "model": "gpt-test",
+                            "limit": 2,
+                            "names": ["calendar_create"],
+                            "created_at": 456,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "cache-info",
+                    "--cache-path",
+                    str(cache_path),
+                    "--format",
+                    "json",
+                ],
+                check=True,
+                capture_output=True,
+                env=_env(),
+                text=True,
+            )
+
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["entries"], 2)
+        self.assertEqual(payload["providers"], ["heuristic", "openai"])
+        self.assertEqual(payload["models"], ["gpt-test"])
+        self.assertEqual(payload["oldest_created_at"], 123)
+        self.assertEqual(payload["newest_created_at"], 456)
 
 
 def _env() -> dict[str, str]:

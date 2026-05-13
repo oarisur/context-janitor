@@ -22,7 +22,10 @@ jobs:
       - run: python -m mypy src scripts
       - run: python -m pytest
       - run: janitor prune --prompt "Search GitHub issues" --tools examples/tools.json --limit 2
+      - run: janitor lint --tools examples/tools.json
       - run: python scripts/prepare_evals.py --logs examples/agent_logs.example.jsonl --success-field success
       - run: python scripts/evaluate.py --tools examples/tools.json --evals examples/evals.example.json --providers heuristic --limit 2 --min-accuracy 1.0
       - run: python scripts/eval_agent.py --tools examples/tools.json --evals examples/evals.example.json --providers heuristic --limit 2 --min-janitor-success-rate 1.0 --min-distraction-delta 0.0 -- python examples/agent_runner_mock.py
       - run: python -m build
+      - run: python -m pip install --force-reinstall dist/*.whl
+      - run: janitor prune --prompt "Search GitHub issues" --tools examples/tools.json --limit 2 --format names

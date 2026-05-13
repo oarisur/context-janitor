@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from context_janitor.models import Tool
-from context_janitor.providers import select_with_provider
+from context_janitor.providers import ProviderError, select_with_provider
 
 
 class _FakeResponse:
@@ -19,6 +19,14 @@ class _FakeResponse:
 
     def read(self):
         return json.dumps(self.payload).encode("utf-8")
+
+
+class _FakeTextResponse(_FakeResponse):
+    def __init__(self, text):
+        self.text = text
+
+    def read(self):
+        return self.text.encode("utf-8")
 
 
 class ProviderTest(unittest.TestCase):
@@ -97,6 +105,22 @@ class ProviderTest(unittest.TestCase):
     def test_provider_rejects_non_positive_limit(self):
         with self.assertRaisesRegex(ValueError, "limit"):
             select_with_provider("heuristic", "Search", _tools(), 0)
+
+    def test_provider_wraps_malformed_response(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}), patch(
+            "urllib.request.urlopen",
+            return_value=_FakeResponse({"unexpected": []}),
+        ):
+            with self.assertRaisesRegex(ProviderError, "malformed"):
+                select_with_provider("openai", "Search GitHub issues", _tools(), 1, "gpt-test")
+
+    def test_provider_wraps_invalid_json_response(self):
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}), patch(
+            "urllib.request.urlopen",
+            return_value=_FakeTextResponse("not json"),
+        ):
+            with self.assertRaisesRegex(ProviderError, "invalid JSON"):
+                select_with_provider("openai", "Search GitHub issues", _tools(), 1, "gpt-test")
 
 
 def _tools():

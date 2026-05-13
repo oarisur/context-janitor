@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from .cache import clear_cache, default_cache_path
+from .cache import cache_info, clear_cache, default_cache_path
 from .config import JanitorConfig, load_config, merge_config
 from .models import load_tools, raw_tools
 from .providers import ProviderError
@@ -55,6 +55,14 @@ def main(argv: list[str] | None = None) -> int:
     cache = subparsers.add_parser("clear-cache", help="Delete the local selection cache.")
     cache.add_argument("--cache-path", help="Optional cache file path. Defaults to ~/.janitor_cache/cache.json.")
     cache.set_defaults(func=_clear_cache)
+
+    cache_info_parser = subparsers.add_parser("cache-info", help="Show local selection cache metadata.")
+    cache_info_parser.add_argument(
+        "--cache-path",
+        help="Optional cache file path. Defaults to ~/.janitor_cache/cache.json.",
+    )
+    cache_info_parser.add_argument("--format", choices=["text", "json"], default="text")
+    cache_info_parser.set_defaults(func=_cache_info)
 
     args = parser.parse_args(argv)
     try:
@@ -121,6 +129,24 @@ def _clear_cache(args: argparse.Namespace) -> int:
         print(f"cleared cache: {path}")
     else:
         print(f"cache already empty: {path}")
+    return 0
+
+
+def _cache_info(args: argparse.Namespace) -> int:
+    path = Path(args.cache_path) if args.cache_path else default_cache_path()
+    info = cache_info(path)
+    if args.format == "json":
+        json.dump(info, sys.stdout, indent=2)
+        sys.stdout.write("\n")
+        return 0
+
+    print(f"path: {info['path']}")
+    print(f"exists: {str(info['exists']).lower()}")
+    print(f"entries: {info['entries']}")
+    print(f"providers: {', '.join(info['providers']) or '-'}")
+    print(f"models: {', '.join(info['models']) or '-'}")
+    print(f"oldest_created_at: {info['oldest_created_at'] or '-'}")
+    print(f"newest_created_at: {info['newest_created_at'] or '-'}")
     return 0
 
 
@@ -324,10 +350,63 @@ def _lint_warnings(tools: list[Any]) -> list[str]:
             warnings.append(f"duplicate tool name '{name}' appears {count} times")
 
     for tool in tools:
-        if not tool.description.strip():
+        description = tool.description.strip()
+        if not description:
             warnings.append(f"tool '{tool.name}' has an empty description")
-        elif len(tool.description.strip()) < 12:
+        elif len(description) < 12:
             warnings.append(f"tool '{tool.name}' has a very short description")
+        elif len(description) > 600:
+            warnings.append(f"tool '{tool.name}' has a very long description")
+        if _is_generic_name(tool.name):
+            warnings.append(f"tool '{tool.name}' has a generic name")
+        warnings.extend(_schema_warnings(tool))
+
+    descriptions = [tool.description.strip() for tool in tools if tool.description.strip()]
+    for description, count in Counter(descriptions).items():
+        if count > 1:
+            warnings.append(f"description reused by {count} tools: '{description[:80]}'")
+    return warnings
+
+
+def _is_generic_name(name: str) -> bool:
+    generic_terms = {
+        "call",
+        "create",
+        "delete",
+        "do",
+        "execute",
+        "fetch",
+        "get",
+        "handle",
+        "process",
+        "query",
+        "read",
+        "run",
+        "search",
+        "send",
+        "set",
+        "tool",
+        "update",
+        "write",
+    }
+    terms = [part for part in name.lower().replace("-", "_").split("_") if part]
+    return bool(terms) and len(terms) <= 2 and all(term in generic_terms for term in terms)
+
+
+def _schema_warnings(tool: Any) -> list[str]:
+    raw = tool.raw or {}
+    warnings = []
+    if raw.get("type") == "function" and isinstance(raw.get("function"), dict):
+        function = raw["function"]
+        parameters = function.get("parameters")
+        if parameters is None:
+            warnings.append(f"OpenAI function tool '{tool.name}' is missing parameters")
+        elif not isinstance(parameters, dict):
+            warnings.append(f"OpenAI function tool '{tool.name}' parameters must be an object")
+
+    input_schema = raw.get("inputSchema")
+    if input_schema is not None and not isinstance(input_schema, dict):
+        warnings.append(f"MCP tool '{tool.name}' inputSchema must be an object")
     return warnings
 
 

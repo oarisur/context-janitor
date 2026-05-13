@@ -28,16 +28,19 @@ def select_with_provider(
         raise ValueError("limit must be greater than zero.")
 
     provider = provider.lower()
-    if provider == "heuristic":
-        return select_tools(prompt, tools, limit)
-    if provider == "openai":
-        names = _select_openai(prompt, tools, limit, model, timeout_seconds)
-    elif provider == "anthropic":
-        names = _select_anthropic(prompt, tools, limit, model, timeout_seconds)
-    elif provider == "gemini":
-        names = _select_gemini(prompt, tools, limit, model, timeout_seconds)
-    else:
-        raise ProviderError(f"Unknown provider '{provider}'.")
+    try:
+        if provider == "heuristic":
+            return select_tools(prompt, tools, limit)
+        if provider == "openai":
+            names = _select_openai(prompt, tools, limit, model, timeout_seconds)
+        elif provider == "anthropic":
+            names = _select_anthropic(prompt, tools, limit, model, timeout_seconds)
+        elif provider == "gemini":
+            names = _select_gemini(prompt, tools, limit, model, timeout_seconds)
+        else:
+            raise ProviderError(f"Unknown provider '{provider}'.")
+    except (KeyError, IndexError, TypeError) as error:
+        raise ProviderError(f"{provider} returned a malformed response.") from error
 
     return _tools_by_names(names, tools, limit) or select_tools(prompt, tools, limit)
 
@@ -155,6 +158,8 @@ def _post_json(
     try:
         with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             return json.loads(response.read().decode("utf-8"))
+    except json.JSONDecodeError as error:
+        raise ProviderError("Provider returned invalid JSON.") from error
     except urllib.error.HTTPError as error:
         message = error.read().decode("utf-8", errors="replace")
         raise ProviderError(f"Provider request failed with HTTP {error.code}: {message}") from error

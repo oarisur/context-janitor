@@ -29,6 +29,26 @@ def clear_cache(cache_path: Path | None = None) -> bool:
     return True
 
 
+def cache_info(cache_path: Path | None = None) -> dict[str, Any]:
+    path = cache_path or default_cache_path()
+    payload = _read_cache(path)
+    entries = [entry for entry in payload.values() if isinstance(entry, dict)]
+    created_at: list[int] = []
+    for entry in entries:
+        value = entry.get("created_at")
+        if isinstance(value, int):
+            created_at.append(value)
+    return {
+        "path": str(path),
+        "exists": path.exists(),
+        "entries": len(entries),
+        "providers": sorted({str(entry.get("provider")) for entry in entries if entry.get("provider")}),
+        "models": sorted({str(entry.get("model")) for entry in entries if entry.get("model")}),
+        "oldest_created_at": min(created_at) if created_at else None,
+        "newest_created_at": max(created_at) if created_at else None,
+    }
+
+
 def get_cached_selection(
     prompt: str,
     tools: list[Tool],

@@ -349,6 +349,12 @@ Clear the local cache while iterating on prompts or tool descriptions:
 janitor clear-cache
 ```
 
+Inspect cache metadata:
+
+```powershell
+janitor cache-info
+```
+
 ## Explain Mode
 
 Use `--explain` to see why tools were kept or pruned.
@@ -440,6 +446,14 @@ Delete the local semantic-selection cache:
 
 ```text
 janitor clear-cache
+```
+
+### `janitor cache-info`
+
+Show cache path, entry count, providers, models, and creation timestamps:
+
+```text
+janitor cache-info
 ```
 
 ## Python API
