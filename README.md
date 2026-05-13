@@ -92,6 +92,19 @@ The package exposes two console scripts:
 
 Most examples use the shorter `janitor` command.
 
+On Windows, `pip` may install those scripts outside your current `PATH`. If `janitor` is not
+recognized in `cmd.exe`, use:
+
+```bat
+set PATH=%PATH%;%APPDATA%\Python\Python314\Scripts
+```
+
+Or run the module directly:
+
+```powershell
+python -m context_janitor.cli --help
+```
+
 ## Quick Start
 
 ```powershell
@@ -146,6 +159,12 @@ writes the modified payload to stdout.
 
 ```powershell
 Get-Content request.json | janitor middleware --limit 5
+```
+
+In `cmd.exe`, use `type` instead of `Get-Content`:
+
+```bat
+type examples\request.example.json | janitor middleware --limit 2
 ```
 
 Input shape:

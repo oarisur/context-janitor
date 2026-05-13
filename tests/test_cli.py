@@ -220,6 +220,18 @@ class CliTest(unittest.TestCase):
         self.assertEqual(len(payload["tools"]), 2)
         self.assertIn("event=dry_run", result.stderr)
 
+    def test_middleware_rejects_non_object_json(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "context_janitor.cli", "middleware", "--limit", "1"],
+            input=json.dumps([{"prompt": "not a request"}]),
+            capture_output=True,
+            env=_env(),
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("middleware input must be a JSON object", result.stderr)
+
     def test_cli_keep_forces_required_tool(self):
         import tempfile
 

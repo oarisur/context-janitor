@@ -1,68 +1,66 @@
-import time
-import json
+from __future__ import annotations
+
 import random
 import sys
-from context_janitor.selection import select_resilient
-from context_janitor.models import load_tools
+import time
+from pathlib import Path
 
-# A catalog of 50 tools to simulate a "noisy" environment
-all_tools = [
-    {"name": "github_search", "description": "Search issues/PRs"},
-    {"name": "github_create_pr", "description": "Open a pull request"},
-    {"name": "db_query", "description": "Run SQL on postgres"},
-    {"name": "send_email", "description": "Send via Gmail"},
-    {"name": "slack_msg", "description": "Post to slack channel"}
-] + [{"name": f"junk_tool_{i}", "description": f"Irrelevant task {i}"} for i in range(45)]
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
 
-prompts = [
+from context_janitor.models import load_tools  # noqa: E402
+from context_janitor.selection import select_resilient  # noqa: E402
+
+
+ALL_TOOLS = [
+    {"name": "github_search", "description": "Search issues and pull requests."},
+    {"name": "github_create_pr", "description": "Open a pull request."},
+    {"name": "db_query", "description": "Run SQL on postgres."},
+    {"name": "send_email", "description": "Send a message via Gmail."},
+    {"name": "slack_msg", "description": "Post a message to a Slack channel."},
+] + [{"name": f"junk_tool_{i}", "description": f"Irrelevant task {i}."} for i in range(45)]
+
+PROMPTS = [
     "Find github issues about auth",
     "Query the database for users",
     "Send an email to support",
-    "Message the team on slack"
+    "Message the team on slack",
 ]
 
-def run_report(runs=100):
-    print(f"📊 Running ROI Simulation ({runs} requests)...")
+
+def run_report(runs: int = 100) -> None:
+    print(f"Running ROI Simulation ({runs} requests)...")
+    tools = load_tools(ALL_TOOLS)
     total_saved_usd = 0.0
     total_time_ms = 0.0
     total_tokens_before = 0
     total_tokens_after = 0
-    
-    # 1 Million tokens = $5.00
-    PRICE_PER_MILLION = 5.0 
 
     for _ in range(runs):
-        prompt = random.choice(prompts)
-        
-        start = time.time()
-        res = select_resilient(
+        prompt = random.choice(PROMPTS)
+        started = time.perf_counter()
+        result = select_resilient(
             provider="heuristic",
             prompt=prompt,
-            tools=load_tools(all_tools),
-            limit=3
+            tools=tools,
+            limit=3,
         )
-        total_time_ms += (time.time() - start) * 1000
+        total_time_ms += (time.perf_counter() - started) * 1000
+        total_tokens_before += result.metrics.original_tokens
+        total_tokens_after += result.metrics.selected_tokens
+        total_saved_usd += result.metrics.estimated_savings_usd
 
-        # Calculate Tokens (Length / 4)
-        tokens_before = len(json.dumps(all_tools)) // 4
-        # res.selected contains the kept tools
-        tokens_after = len(str(res.selected)) // 4 
-        
-        total_tokens_before += tokens_before
-        total_tokens_after += tokens_after
+    reduction = ((total_tokens_before - total_tokens_after) / total_tokens_before) * 100
 
-        # Calculate Savings
-        saved_tokens = tokens_before - tokens_after
-        total_saved_usd += (saved_tokens / 1_000_000) * PRICE_PER_MILLION
-
-    print("\n" + "="*45)
-    print(f"   CONTEXT JANITOR FINANCIAL REPORT")
-    print("="*45)
+    print("\n" + "=" * 45)
+    print("   CONTEXT JANITOR FINANCIAL REPORT")
+    print("=" * 45)
     print(f"Total Requests:     {runs}")
-    print(f"Token Reduction:    {((total_tokens_before - total_tokens_after)/total_tokens_before)*100:.1f}%")
-    print(f"Avg. Latency:       {total_time_ms/runs:.2f} ms")
+    print(f"Token Reduction:    {reduction:.1f}%")
+    print(f"Avg. Latency:       {total_time_ms / runs:.2f} ms")
     print(f"Total USD Saved:    ${total_saved_usd:.4f}")
-    print("="*45)
+    print("=" * 45)
+
 
 if __name__ == "__main__":
     run_report()

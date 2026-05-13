@@ -86,6 +86,7 @@ def main() -> int:
                 "examples/agent_runner_mock.py",
             ],
         ),
+        ("roi report", [sys.executable, "scripts/roi_reporter.py"]),
         ("build", [sys.executable, "-m", "build"]),
     ]
 
@@ -134,8 +135,10 @@ def _inspect_sdist() -> None:
     required = {
         "context_janitor-0.1.0/docs/production-rollout.md",
         "context_janitor-0.1.0/examples/agent_logs.example.jsonl",
+        "context_janitor-0.1.0/examples/request.example.json",
         "context_janitor-0.1.0/scripts/eval_agent.py",
         "context_janitor-0.1.0/scripts/prepare_evals.py",
+        "context_janitor-0.1.0/scripts/roi_reporter.py",
         "context_janitor-0.1.0/src/context_janitor/py.typed",
     }
     missing = sorted(required - set(names))

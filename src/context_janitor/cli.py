@@ -154,6 +154,8 @@ def _middleware(args: argparse.Namespace) -> int:
     config = _resolve_config(args)
     logger = _setup_logging(config.log_level)
     payload = json.load(sys.stdin)
+    if not isinstance(payload, dict):
+        raise ValueError("middleware input must be a JSON object with optional 'messages' and 'tools' fields.")
     tools = load_tools(payload.get("tools", []))
     prompt = _prompt_from_messages(payload.get("messages", []))
     result = select_resilient(
