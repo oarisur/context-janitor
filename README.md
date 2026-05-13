@@ -560,6 +560,40 @@ Eval files may be JSON or JSONL. Each case needs a `prompt` and one of `expected
 For production rollout, replace `examples/evals.example.json` with real tasks from your agent logs
 and track the resulting accuracy alongside downstream agent success.
 
+## Agent Success Evals
+
+Use `scripts/eval_agent.py` when you want to measure the whole agent loop, not just whether the
+expected tool survived pruning.
+
+The harness runs your agent command once with the full catalog and once with Janitor-pruned tools.
+Each run receives a JSON payload on stdin:
+
+```json
+{
+  "id": "github-triage",
+  "mode": "janitor",
+  "provider": "heuristic",
+  "prompt": "Find open GitHub issues about billing and summarize the blockers.",
+  "expected_tools": ["github_search_issues"],
+  "tools": [{ "name": "github_search_issues", "description": "Search GitHub issues." }]
+}
+```
+
+The agent command should print JSON with a boolean `success` field:
+
+```json
+{ "success": true, "used_tools": ["github_search_issues"] }
+```
+
+Run the bundled deterministic mock agent:
+
+```powershell
+python scripts\eval_agent.py --tools examples\tools.json --evals examples\evals.example.json --providers heuristic --limit 2 -- python examples\agent_runner_mock.py
+```
+
+For a local model or real agent, replace the command after `--` with your runner. The runner can
+call Ollama, llama.cpp, a LangGraph app, or any process that accepts the JSON payload on stdin.
+
 ## Recipes
 
 - [LangChain / LangGraph](recipes/langchain-langgraph.md)

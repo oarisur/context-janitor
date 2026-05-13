@@ -23,3 +23,4 @@ jobs:
       - run: python -m pytest
       - run: janitor prune --prompt "Search GitHub issues" --tools examples/tools.json --limit 2
       - run: python scripts/evaluate.py --tools examples/tools.json --evals examples/evals.example.json --providers heuristic --limit 2
+      - run: python scripts/eval_agent.py --tools examples/tools.json --evals examples/evals.example.json --providers heuristic --limit 2 -- python examples/agent_runner_mock.py
