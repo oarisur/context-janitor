@@ -37,6 +37,25 @@ STOP_WORDS = {
     "with",
 }
 
+PROMPT_ALIASES = {
+    "appointment": ("calendar", "event"),
+    "bug": ("github", "issues"),
+    "bugs": ("github", "issues"),
+    "charge": ("stripe", "checkout"),
+    "charges": ("stripe", "checkout"),
+    "database": ("postgres", "query"),
+    "db": ("postgres", "query"),
+    "email": ("gmail",),
+    "emails": ("gmail",),
+    "meeting": ("calendar", "event"),
+    "meetings": ("calendar", "event"),
+    "payment": ("stripe", "checkout"),
+    "payments": ("stripe", "checkout"),
+    "pr": ("pull", "request"),
+    "schedule": ("calendar", "event"),
+    "sql": ("postgres", "query"),
+}
+
 
 @dataclass(frozen=True)
 class ToolExplanation:
@@ -53,7 +72,7 @@ def select_tools(prompt: str, tools: list[Tool], limit: int = 5) -> list[Tool]:
     if len(tools) <= limit:
         return tools
 
-    prompt_terms = _tokens(prompt)
+    prompt_terms = _expand_prompt_terms(_tokens(prompt))
     if not prompt_terms:
         return tools[:limit]
 
@@ -73,7 +92,7 @@ def explain_tools(prompt: str, tools: list[Tool], limit: int = 5) -> list[ToolEx
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
 
-    prompt_terms = _tokens(prompt)
+    prompt_terms = _expand_prompt_terms(_tokens(prompt))
     document_terms = [_tokens(tool.searchable_text) for tool in tools]
     document_frequency = Counter(term for terms in document_terms for term in set(terms))
     scored = []
@@ -172,3 +191,10 @@ def _tokens(text: str) -> list[str]:
 
 def tokens(text: str) -> list[str]:
     return _tokens(text)
+
+
+def _expand_prompt_terms(prompt_terms: list[str]) -> list[str]:
+    expanded = list(prompt_terms)
+    for term in prompt_terms:
+        expanded.extend(PROMPT_ALIASES.get(term, ()))
+    return expanded

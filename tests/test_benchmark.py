@@ -16,7 +16,7 @@ class BenchmarkTest(unittest.TestCase):
 
         self.assertIn("No Janitor (baseline)", result.stdout)
         self.assertIn("heuristic", result.stdout)
-        self.assertIn("97.0%", result.stdout)
+        self.assertIn("100.0%", result.stdout)
         self.assertIn("Compression", result.stdout)
 
 

@@ -21,5 +21,16 @@ class SelectToolsTest(unittest.TestCase):
 
         self.assertEqual(select_tools("anything", tools, limit=5), tools)
 
+    def test_select_tools_expands_common_intent_aliases(self):
+        tools = [
+            Tool("github_search_issues", "Search GitHub issues by label and state."),
+            Tool("calendar_create_event", "Create calendar events with attendees and time."),
+        ]
+
+        selected = select_tools("Schedule a meeting tomorrow afternoon", tools, limit=1)
+
+        self.assertEqual([tool.name for tool in selected], ["calendar_create_event"])
+
+
 if __name__ == "__main__":
     unittest.main()

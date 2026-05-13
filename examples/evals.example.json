@@ -1,0 +1,42 @@
+[
+  {
+    "id": "github-triage",
+    "prompt": "Find open GitHub issues about billing and summarize the blockers.",
+    "expected_tool": "github_search_issues"
+  },
+  {
+    "id": "release-pr",
+    "prompt": "Open a pull request for the release-notes branch.",
+    "expected_tool": "github_create_pr"
+  },
+  {
+    "id": "calendar-sync",
+    "prompt": "Schedule a meeting with the support team tomorrow afternoon.",
+    "expected_tool": "calendar_create_event"
+  },
+  {
+    "id": "customer-email",
+    "prompt": "Email the customer a short update about their support escalation.",
+    "expected_tool": "gmail_send_email"
+  },
+  {
+    "id": "pricing-research",
+    "prompt": "Search the web for current competitor pricing references.",
+    "expected_tool": "web_search"
+  },
+  {
+    "id": "contract-summary",
+    "prompt": "Extract text from the signed contract PDF and summarize the renewal terms.",
+    "expected_tool": "pdf_extract_text"
+  },
+  {
+    "id": "payment-link",
+    "prompt": "Create a Stripe checkout link for the annual plan.",
+    "expected_tool": "stripe_create_checkout"
+  },
+  {
+    "id": "database-report",
+    "prompt": "Run a Postgres query for yesterday's failed jobs.",
+    "expected_tool": "postgres_query"
+  }
+]

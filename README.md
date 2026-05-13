@@ -1,6 +1,6 @@
 # Context Janitor
 
-**97.0% tool-selection accuracy at 0 ms median latency, with zero router cost.**
+**100.0% tool-selection accuracy on the bundled synthetic benchmark at 0 ms median latency, with zero router cost.**
 
 ![Context Janitor terminal demo](assets/terminal-demo.svg)
 
@@ -44,8 +44,8 @@ Current output on the included 100-prompt synthetic benchmark and `examples/tool
 +-----------------------+--------------------+---------------+-----------+--------+-----------------+------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 | Mode                  | Selection accuracy | Agent success | Median ms | p95 ms | Router cost/run | Tool payload/run | Compression | Notes                                                                                                                                      |
 +-----------------------+--------------------+---------------+-----------+--------+-----------------+------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| No Janitor (baseline) | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.001060        | 0.0%        | all 8 tools sent for 100 prompts                                                                                                           |
-| heuristic             | 97.0%              | not measured  | 0         | 0      | $0.000000       | $0.000328        | 69.1%       | ok; misses: calendar_create_event -> postgres_query; github_search_issues -> postgres_query; github_search_issues -> calendar_create_event |
+| No Janitor (baseline) | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.001060        | 0.0%        | all 8 tools sent for 100 prompts |
+| heuristic             | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.000260        | 75.4%       | ok |
 +-----------------------+--------------------+---------------+-----------+--------+-----------------+------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
@@ -486,6 +486,31 @@ Example agent success file:
 ```
 
 The benchmark skips API providers when their API keys are missing.
+
+## Real Prompt Evals
+
+Use `scripts/evaluate.py` to check Janitor against prompts from your own product instead of the
+bundled synthetic benchmark:
+
+```powershell
+python scripts\evaluate.py --tools examples\tools.json --evals examples\evals.example.json --providers heuristic --limit 2
+```
+
+Eval files may be JSON or JSONL. Each case needs a `prompt` and one of `expected_tool`,
+`expected_tools`, or `expected`:
+
+```json
+[
+  {
+    "id": "github-triage",
+    "prompt": "Find open GitHub issues about billing and summarize the blockers.",
+    "expected_tool": "github_search_issues"
+  }
+]
+```
+
+For production rollout, replace `examples/evals.example.json` with real tasks from your agent logs
+and track the resulting accuracy alongside downstream agent success.
 
 ## Recipes
 
