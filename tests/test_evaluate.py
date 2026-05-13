@@ -88,6 +88,36 @@ class EvaluateTest(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertEqual(payload["cases"], 2)
 
+    def test_evaluate_fails_when_accuracy_threshold_is_not_met(self):
+        root = Path(__file__).resolve().parents[1]
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                "scripts/evaluate.py",
+                "--tools",
+                "examples/tools.json",
+                "--evals",
+                "examples/evals.example.json",
+                "--providers",
+                "heuristic",
+                "--limit",
+                "2",
+                "--min-accuracy",
+                "1.1",
+                "--format",
+                "json",
+            ],
+            capture_output=True,
+            cwd=root,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["threshold_failures"])
+        self.assertIn("accuracy", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

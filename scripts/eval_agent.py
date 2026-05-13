@@ -29,6 +29,16 @@ def main() -> int:
     parser.add_argument("--openai-model")
     parser.add_argument("--anthropic-model")
     parser.add_argument("--gemini-model")
+    parser.add_argument(
+        "--min-janitor-success-rate",
+        type=float,
+        help="Fail if any Janitor provider falls below this agent success rate.",
+    )
+    parser.add_argument(
+        "--min-distraction-delta",
+        type=float,
+        help="Fail if any Janitor provider falls below this success-rate delta versus baseline.",
+    )
     parser.add_argument("--format", choices=["table", "json"], default="table")
     parser.add_argument(
         "command",
@@ -81,12 +91,20 @@ def main() -> int:
         row["distraction_delta"] = row["success_rate"] - baseline["success_rate"]
         rows.append(row)
 
+    threshold_failures = _threshold_failures(
+        rows,
+        args.min_janitor_success_rate,
+        args.min_distraction_delta,
+    )
+
     if args.format == "json":
-        json.dump({"cases": len(cases), "results": rows}, sys.stdout, indent=2)
+        json.dump({"cases": len(cases), "results": rows, "threshold_failures": threshold_failures}, sys.stdout, indent=2)
         sys.stdout.write("\n")
     else:
         _print_table(rows)
-    return 0
+    for failure in threshold_failures:
+        print(f"error: {failure}", file=sys.stderr)
+    return 1 if threshold_failures else 0
 
 
 def _run_mode(
@@ -245,6 +263,29 @@ def _format_delta(value: float | None) -> str:
         return "-"
     sign = "+" if value >= 0 else ""
     return f"{sign}{value:.1%}"
+
+
+def _threshold_failures(
+    rows: list[dict[str, Any]],
+    min_success_rate: float | None,
+    min_distraction_delta: float | None,
+) -> list[str]:
+    failures = []
+    for row in rows:
+        if row["mode"] != "janitor":
+            continue
+        provider = row["provider"]
+        success_rate = row["success_rate"]
+        if min_success_rate is not None and success_rate < min_success_rate:
+            failures.append(
+                f"{provider} agent success {success_rate:.1%} is below minimum {min_success_rate:.1%}"
+            )
+        delta = row["distraction_delta"]
+        if min_distraction_delta is not None and delta is not None and delta < min_distraction_delta:
+            failures.append(
+                f"{provider} Distraction Delta {delta:.1%} is below minimum {min_distraction_delta:.1%}"
+            )
+    return failures
 
 
 def _failure_summary(failures: list[dict[str, Any]]) -> str:

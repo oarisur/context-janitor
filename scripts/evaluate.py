@@ -30,6 +30,12 @@ def main() -> int:
         "--agent-success-file",
         help="Optional JSON map of measured agent success rates by provider.",
     )
+    parser.add_argument("--min-accuracy", type=float, help="Fail if any evaluated provider falls below this accuracy.")
+    parser.add_argument(
+        "--min-distraction-delta",
+        type=float,
+        help="Fail if any evaluated provider falls below this measured agent-success delta.",
+    )
     parser.add_argument("--format", choices=["table", "json"], default="table")
     args = parser.parse_args()
 
@@ -50,12 +56,16 @@ def main() -> int:
         for provider in args.providers
     ]
 
+    threshold_failures = _threshold_failures(rows, args.min_accuracy, args.min_distraction_delta)
+
     if args.format == "json":
-        json.dump({"cases": len(cases), "results": rows}, sys.stdout, indent=2)
+        json.dump({"cases": len(cases), "results": rows, "threshold_failures": threshold_failures}, sys.stdout, indent=2)
         sys.stdout.write("\n")
     else:
         _print_table(rows)
-    return 0
+    for failure in threshold_failures:
+        print(f"error: {failure}", file=sys.stderr)
+    return 1 if threshold_failures else 0
 
 
 def _evaluate_provider(
@@ -275,6 +285,25 @@ def _print_table(rows: list[dict[str, Any]]) -> None:
     for row in display_rows:
         print("| " + " | ".join(str(row[key]).ljust(width) for key, width in zip(keys, widths)) + " |")
     print(divider)
+
+
+def _threshold_failures(
+    rows: list[dict[str, Any]],
+    min_accuracy: float | None,
+    min_distraction_delta: float | None,
+) -> list[str]:
+    failures = []
+    for row in rows:
+        provider = row["provider"]
+        accuracy = row["accuracy"]
+        if min_accuracy is not None and accuracy is not None and accuracy < min_accuracy:
+            failures.append(f"{provider} accuracy {accuracy:.1%} is below minimum {min_accuracy:.1%}")
+        delta = row["distraction_delta"]
+        if min_distraction_delta is not None and delta is not None and delta < min_distraction_delta:
+            failures.append(
+                f"{provider} Distraction Delta {delta:.1%} is below minimum {min_distraction_delta:.1%}"
+            )
+    return failures
 
 
 def _format_percent(value: float | None) -> str:

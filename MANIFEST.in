@@ -1,0 +1,8 @@
+include .janitor.yaml.example
+recursive-include assets *
+recursive-include docs *
+recursive-include examples *
+recursive-include recipes *
+recursive-include scripts *
+recursive-include tests *
+global-exclude *.py[cod]

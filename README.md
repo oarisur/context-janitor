@@ -594,6 +594,8 @@ python scripts\eval_agent.py --tools examples\tools.json --evals examples\evals.
 For a local model or real agent, replace the command after `--` with your runner. The runner can
 call Ollama, llama.cpp, a LangGraph app, or any process that accepts the JSON payload on stdin.
 
+For thresholded rollout gates, see [Production Rollout](docs/production-rollout.md).
+
 ## Recipes
 
 - [LangChain / LangGraph](recipes/langchain-langgraph.md)
@@ -647,11 +649,19 @@ Run the benchmark:
 python scripts\benchmark.py --providers heuristic
 ```
 
+Build distributable artifacts:
+
+```powershell
+python -m build
+```
+
 ## Release Checklist
 
 - Confirm `version = "0.1.0"` in [pyproject.toml](pyproject.toml).
 - Create a matching GitHub release tag, for example `v0.1.0`.
 - Run the tests and benchmark.
+- Run thresholded selection and agent-success evals.
+- Build the wheel and source distribution.
 - Render or update the terminal GIF.
 - Verify the README examples still match CLI output.
 
