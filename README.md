@@ -596,6 +596,12 @@ call Ollama, llama.cpp, a LangGraph app, or any process that accepts the JSON pa
 
 For thresholded rollout gates, see [Production Rollout](docs/production-rollout.md).
 
+To draft a real eval pack from agent logs:
+
+```powershell
+python scripts\prepare_evals.py --logs agent-logs.jsonl --success-field success --output production-evals.draft.json
+```
+
 ## Recipes
 
 - [LangChain / LangGraph](recipes/langchain-langgraph.md)

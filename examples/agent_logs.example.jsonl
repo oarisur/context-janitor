@@ -1,0 +1,4 @@
+{"id":"run-001","prompt":"Find open GitHub issues about billing and summarize the blockers.","tool_calls":[{"name":"github_search_issues"}],"success":true}
+{"id":"run-002","prompt":"Open a pull request for the release-notes branch.","tool_calls":[{"function":{"name":"github_create_pr"}}],"success":true}
+{"id":"run-003","prompt":"Schedule a meeting with the support team tomorrow afternoon.","tool_calls":["calendar_create_event"],"success":true}
+{"id":"run-004","prompt":"This row failed and should be skipped when success filtering is enabled.","tool_calls":["web_search"],"success":false}

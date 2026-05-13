@@ -7,6 +7,24 @@ Use this checklist when moving Context Janitor from pilot traffic to production 
 Start from agent logs, not synthetic prompts. Aim for 50-100 representative cases before relying on
 the results.
 
+Create a first draft from JSON or JSONL logs:
+
+```powershell
+python scripts\prepare_evals.py `
+  --logs agent-logs.jsonl `
+  --success-field success `
+  --output production-evals.draft.json
+```
+
+The default log fields are:
+
+- `prompt`
+- `tool_calls`
+- `id`
+
+Use `--prompt-field`, `--tool-field`, and `--id-field` for nested log shapes such as
+`input.prompt` or `trace.id`.
+
 Each case should include:
 
 - `id`: stable identifier for triage
@@ -23,6 +41,9 @@ Example:
   "expected_tool": "github_search_issues"
 }
 ```
+
+Review the draft before using it as a gate. The extractor records `source_index` on each case so
+you can trace it back to the original log row.
 
 ## 2. Gate Tool Selection
 
