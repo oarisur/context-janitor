@@ -4,6 +4,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+PROVIDERS = frozenset({"heuristic", "openai", "anthropic", "gemini"})
+FALLBACKS = frozenset({"heuristic", "none"})
+LOG_LEVELS = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
+FORMATS = frozenset({"json", "names", "raw"})
+
 
 @dataclass(frozen=True)
 class JanitorConfig:
@@ -17,6 +22,27 @@ class JanitorConfig:
     format: str = "json"
     price_per_million_tokens: float = 5.0
     keep: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "provider", self.provider.lower())
+        object.__setattr__(self, "fallback", self.fallback.lower())
+        object.__setattr__(self, "log_level", self.log_level.upper())
+        object.__setattr__(self, "format", self.format.lower())
+
+        if self.provider not in PROVIDERS:
+            raise ValueError(f"provider must be one of: {', '.join(sorted(PROVIDERS))}.")
+        if self.fallback not in FALLBACKS:
+            raise ValueError(f"fallback must be one of: {', '.join(sorted(FALLBACKS))}.")
+        if self.log_level not in LOG_LEVELS:
+            raise ValueError(f"log_level must be one of: {', '.join(sorted(LOG_LEVELS))}.")
+        if self.format not in FORMATS:
+            raise ValueError(f"format must be one of: {', '.join(sorted(FORMATS))}.")
+        if self.limit <= 0:
+            raise ValueError("limit must be greater than zero.")
+        if self.timeout_ms <= 0:
+            raise ValueError("timeout_ms must be greater than zero.")
+        if self.price_per_million_tokens < 0:
+            raise ValueError("price_per_million_tokens must be zero or greater.")
 
 
 DEFAULT_CONFIG = JanitorConfig()

@@ -37,6 +37,9 @@ def select_resilient(
     price_per_million_tokens: float = 5.0,
     keep: tuple[str, ...] | list[str] = (),
 ) -> SelectionResult:
+    if limit <= 0:
+        raise ValueError("limit must be greater than zero.")
+
     logger = logger or logging.getLogger("context_janitor")
     started = perf_counter()
     requested_provider = provider
@@ -99,8 +102,33 @@ def select_resilient(
     )
 
 
-async def select_resilient_async(**kwargs: object) -> SelectionResult:
-    return await asyncio.to_thread(select_resilient, **kwargs)
+async def select_resilient_async(
+    provider: str,
+    prompt: str,
+    tools: list[Tool],
+    limit: int = 5,
+    model: str | None = None,
+    fallback: str = "heuristic",
+    timeout_ms: int = 800,
+    cache_enabled: bool = False,
+    logger: logging.Logger | None = None,
+    price_per_million_tokens: float = 5.0,
+    keep: tuple[str, ...] | list[str] = (),
+) -> SelectionResult:
+    return await asyncio.to_thread(
+        select_resilient,
+        provider,
+        prompt,
+        tools,
+        limit,
+        model,
+        fallback,
+        timeout_ms,
+        cache_enabled,
+        logger,
+        price_per_million_tokens,
+        keep,
+    )
 
 
 def _tools_by_names(names: list[str], tools: list[Tool], limit: int) -> list[Tool]:

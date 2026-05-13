@@ -37,6 +37,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Read an OpenAI-compatible request JSON from stdin and prune its tools field.",
     )
     _add_common_options(middleware)
+    middleware.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Log the pruning decision without modifying the request payload.",
+    )
     middleware.set_defaults(func=_middleware)
 
     args = parser.parse_args(argv)
@@ -126,7 +131,7 @@ def _write_output(
             _write_explain_stderr(prompt, tools, config.limit)
         return
 
-    payload = {
+    payload: dict[str, Any] = {
         "selected": [
             {
                 "name": tool.name,
@@ -195,11 +200,6 @@ def _add_common_options(parser: argparse.ArgumentParser) -> None:
         "--explain",
         action="store_true",
         help="Show why tools were kept or pruned.",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="For middleware mode, log the pruning decision without modifying the request payload.",
     )
     parser.add_argument(
         "--keep",

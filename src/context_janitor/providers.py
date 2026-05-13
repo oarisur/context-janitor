@@ -24,6 +24,9 @@ def select_with_provider(
     model: str | None = None,
     timeout_seconds: float = 0.8,
 ) -> list[Tool]:
+    if limit <= 0:
+        raise ValueError("limit must be greater than zero.")
+
     provider = provider.lower()
     if provider == "heuristic":
         return select_tools(prompt, tools, limit)

@@ -35,6 +35,34 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(config.log_level, "INFO")
         self.assertEqual(config.keep, ("log_error", "notify_admin"))
 
+    def test_load_config_normalizes_case(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / ".janitor.yaml"
+            path.write_text("provider: OpenAI\nfallback: Heuristic\nlog_level: info\nformat: Names\n")
+
+            config = load_config(explicit_path=str(path))
+
+        self.assertEqual(config.provider, "openai")
+        self.assertEqual(config.fallback, "heuristic")
+        self.assertEqual(config.log_level, "INFO")
+        self.assertEqual(config.format, "names")
+
+    def test_load_config_rejects_invalid_values(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / ".janitor.yaml"
+            path.write_text("provider: typo\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "provider"):
+                load_config(explicit_path=str(path))
+
+    def test_load_config_rejects_non_positive_limits(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / ".janitor.yaml"
+            path.write_text("limit: 0\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "limit"):
+                load_config(explicit_path=str(path))
+
 
 if __name__ == "__main__":
     unittest.main()
