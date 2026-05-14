@@ -780,6 +780,6 @@ python scripts\release_check.py
 
 ## Project Status
 
-Context Janitor is early alpha software. The heuristic path is dependency-free and tested. API
-provider routing, prompt caching, and integration recipes are ready for real-world feedback, but
-you should benchmark against your own tool catalog before production rollout.
+Context Janitor is at `v1.0.0rc1`: the CLI, config shape, heuristic selector, fallback behavior,
+cache path, MCP proxy, eval tooling, and packaging flow are release-candidate ready. Before a final
+`v1.0.0` rollout, benchmark against your own tool catalog and run at least one real-log eval pack.
