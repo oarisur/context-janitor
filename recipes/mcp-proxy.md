@@ -10,7 +10,7 @@ summarization." Pass that task with `--prompt` or `JANITOR_PROMPT`.
 ## Run A Downstream Server Through Janitor
 
 ```powershell
-python scripts\mcp_tool_proxy.py `
+janitor mcp-proxy `
   --prompt "Find GitHub issues and open pull requests" `
   --limit 5 `
   -- python -m your_mcp_server
@@ -29,7 +29,9 @@ Use the proxy as the MCP server command, then put the real MCP server command af
     "github-triage-pruned": {
       "command": "python",
       "args": [
-        "F:/ContextJanitor/scripts/mcp_tool_proxy.py",
+        "-m",
+        "context_janitor.cli",
+        "mcp-proxy",
         "--prompt",
         "Find GitHub issues and open pull requests",
         "--limit",
@@ -52,14 +54,14 @@ server or configure multiple pruned entries by workflow.
 The proxy defaults to the dependency-free heuristic:
 
 ```powershell
-python scripts\mcp_tool_proxy.py --prompt "Summarize PDFs" --limit 4 -- python -m your_mcp_server
+janitor mcp-proxy --prompt "Summarize PDFs" --limit 4 -- python -m your_mcp_server
 ```
 
 You can use an API-backed router with heuristic fallback:
 
 ```powershell
 $env:OPENAI_API_KEY = "..."
-python scripts\mcp_tool_proxy.py `
+janitor mcp-proxy `
   --provider openai `
   --model gpt-4o-mini `
   --fallback heuristic `

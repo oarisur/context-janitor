@@ -13,8 +13,8 @@ If an API-backed router fails, times out, or is missing credentials, Context Jan
 to a local heuristic so the pipeline keeps moving.
 
 Context Janitor is MCP-compatible by design. MCP servers expose structured tool definitions, and
-Context Janitor can sit between those JSON tool catalogs and your agent runtime. It is not an MCP
-server itself in this release.
+Context Janitor can sit between those JSON tool catalogs and your agent runtime with `janitor
+mcp-proxy`.
 
 ## Why It Exists
 
@@ -360,7 +360,8 @@ Cache file:
 
 The cache stores selections by prompt, provider, model, limit, and catalog hash. It can also reuse
 highly similar prompts. If the cache cannot be read or written, Janitor ignores the cache and keeps
-running.
+running. Cache updates are written through a temporary file and atomically replaced, so interrupted
+writes should not leave partial JSON behind.
 
 Clear the local cache while iterating on prompts or tool descriptions:
 
@@ -447,6 +448,18 @@ janitor middleware [options] < request.json
 ```
 
 Most options match `prune`. `middleware` also supports `--dry-run`.
+
+### `janitor mcp-proxy`
+
+Proxy an MCP stdio server and prune `tools/list` responses before they reach the client:
+
+```text
+janitor mcp-proxy --prompt "Find GitHub issues" --limit 5 -- python -m your_mcp_server
+```
+
+MCP `tools/list` does not include the user's chat prompt, so pass a scoped task prompt with
+`--prompt` or `JANITOR_PROMPT`. Use `--keep` with `prune` or `middleware` for hidden policy tools;
+for MCP proxy sessions, configure the downstream server around one narrow workflow when possible.
 
 ### `janitor lint`
 

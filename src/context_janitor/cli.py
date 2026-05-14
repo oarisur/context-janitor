@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Any
 from .cache import cache_info, clear_cache, default_cache_path
 from .config import JanitorConfig, load_config, merge_config
 from .models import load_tools, raw_tools
+from .mcp_proxy import run_proxy
 from .providers import ProviderError
 from .ranker import explain_tools
 from .selection import SelectionResult, select_resilient
@@ -46,6 +48,24 @@ def main(argv: list[str] | None = None) -> int:
         help="Log the pruning decision without modifying the request payload.",
     )
     middleware.set_defaults(func=_middleware)
+
+    mcp_proxy = subparsers.add_parser(
+        "mcp-proxy",
+        help="Proxy an MCP stdio server and prune tools/list responses.",
+        description="Proxy an MCP stdio server and prune tools/list responses with Context Janitor.",
+    )
+    mcp_proxy.add_argument("--prompt", help="Task prompt used to rank downstream MCP tools.")
+    mcp_proxy.add_argument("--limit", type=int, default=5)
+    mcp_proxy.add_argument(
+        "--provider",
+        choices=["heuristic", "openai", "anthropic", "gemini"],
+        default="heuristic",
+    )
+    mcp_proxy.add_argument("--model")
+    mcp_proxy.add_argument("--fallback", choices=["heuristic", "none"], default="heuristic")
+    mcp_proxy.add_argument("--timeout-ms", type=int, default=800)
+    mcp_proxy.add_argument("command", nargs=argparse.REMAINDER, help="Downstream MCP server command after --.")
+    mcp_proxy.set_defaults(func=_mcp_proxy)
 
     lint = subparsers.add_parser("lint", help="Validate a tool catalog and report quality warnings.")
     lint.add_argument("--tools", required=True, help="Path to a JSON tool catalog.")
@@ -183,6 +203,22 @@ def _middleware(args: argparse.Namespace) -> int:
     json.dump(payload, sys.stdout, indent=2)
     sys.stdout.write("\n")
     return 0
+
+
+def _mcp_proxy(args: argparse.Namespace) -> int:
+    prompt = args.prompt or os.environ.get("JANITOR_PROMPT")
+    if not prompt:
+        print("error: --prompt or JANITOR_PROMPT is required.", file=sys.stderr)
+        return 2
+
+    command = args.command
+    if command and command[0] == "--":
+        command = command[1:]
+    if not command:
+        print("error: downstream MCP server command is required after --.", file=sys.stderr)
+        return 2
+
+    return run_proxy(args, prompt, command)
 
 
 def _write_output(
