@@ -31,6 +31,17 @@ class SelectToolsTest(unittest.TestCase):
 
         self.assertEqual([tool.name for tool in selected], ["calendar_create_event"])
 
+    def test_select_tools_handles_messy_operational_synonyms(self):
+        tools = [
+            Tool("slack_send_message", "Send a Slack message to a channel or user."),
+            Tool("calendar_find_availability", "Find open calendar slots across attendees."),
+            Tool("s3_upload_file", "Upload a file to Amazon S3 with bucket metadata."),
+        ]
+
+        selected = select_tools("backup archive needs to go into ops storage", tools, limit=1)
+
+        self.assertEqual([tool.name for tool in selected], ["s3_upload_file"])
+
 
 if __name__ == "__main__":
     unittest.main()

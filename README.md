@@ -59,6 +59,10 @@ Benchmark notes:
 - The included benchmark is a small synthetic sanity check. Run it against your own catalog before
   making production claims.
 
+The repository also includes `examples/messy_production_evals.jsonl`, a 100-case prompt pack with
+informal, ambiguous workplace phrasing. The release gate requires the local heuristic to keep the
+expected tool for every messy case against the simulated production catalog.
+
 To display measured agent success rates:
 
 ```powershell

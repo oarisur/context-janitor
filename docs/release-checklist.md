@@ -14,6 +14,7 @@ The release gate runs:
 - catalog linting
 - eval-pack preparation smoke test
 - thresholded tool-selection eval
+- thresholded messy-prompt eval
 - thresholded agent-success eval
 - wheel and source distribution build
 - source distribution inspection

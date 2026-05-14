@@ -1,0 +1,100 @@
+{"id":"messy-001","prompt":"can u pull the billing bugs from github? ppl keep whining abt blockers again","expected_tools":["github_search_issues"]}
+{"id":"messy-002","prompt":"any flaky test crap assigned to platform rn? github prob has a pile of em","expected_tools":["github_search_issues"]}
+{"id":"messy-003","prompt":"didnt we already fix oauth last week? find the closed issues or whatever","expected_tools":["github_search_issues"]}
+{"id":"messy-004","prompt":"search for db migration stuff blowing up again in the repo","expected_tools":["github_search_issues"]}
+{"id":"messy-005","prompt":"customers cant log in again lol find those issue threads","expected_tools":["github_search_issues"]}
+{"id":"messy-006","prompt":"yo make a PR from release-notes into main i gotta jump on another call","expected_tools":["github_create_pr"]}
+{"id":"messy-007","prompt":"open the hotfix pr + mention the incident ticket thingy","expected_tools":["github_create_pr"]}
+{"id":"messy-008","prompt":"can someone just open a PR for that docs cleanup branch pls","expected_tools":["github_create_pr"]}
+{"id":"messy-009","prompt":"need a pr from export csv feature into develop before ppl start yelling","expected_tools":["github_create_pr"]}
+{"id":"messy-010","prompt":"make the refactor pr a draft for now i dont trust it yet","expected_tools":["github_create_pr"]}
+{"id":"messy-011","prompt":"make a ticket abt checkout errors handling better this is getting dumb","expected_tools":["linear_create_issue"]}
+{"id":"messy-012","prompt":"urgent onboarding emails are busted again can u file something high prio","expected_tools":["linear_create_issue"]}
+{"id":"messy-013","prompt":"mobile ppl seeing blank invoices smh log a bug for it","expected_tools":["linear_create_issue"]}
+{"id":"messy-014","prompt":"we need docs for the new api limits before support riots","expected_tools":["linear_create_issue"]}
+{"id":"messy-015","prompt":"support dashboard pagination is cursed make a task for that","expected_tools":["linear_create_issue"]}
+{"id":"messy-016","prompt":"move OPS-142 into review n add note that deploy actually worked this time","expected_tools":["jira_transition_ticket"]}
+{"id":"messy-017","prompt":"DEV-883 passed QA finally just mark it done w/ a comment","expected_tools":["jira_transition_ticket"]}
+{"id":"messy-018","prompt":"put SEC-19 back to todo patch exploded in prod","expected_tools":["jira_transition_ticket"]}
+{"id":"messy-019","prompt":"billing ticket is blocked by some dependency nonsense move it accordingly","expected_tools":["jira_transition_ticket"]}
+{"id":"messy-020","prompt":"release task should prob be ready for QA now","expected_tools":["jira_transition_ticket"]}
+{"id":"messy-021","prompt":"send rev summary to marketing slack before the vp pings me again","expected_tools":["slack_send_message"]}
+{"id":"messy-022","prompt":"tell on-call db migration finally finished thank god","expected_tools":["slack_send_message"]}
+{"id":"messy-023","prompt":"support team needs an update abt invoice fix being delayed again","expected_tools":["slack_send_message"]}
+{"id":"messy-024","prompt":"drop the demo acct links in sales slack but make it look nice lol","expected_tools":["slack_send_message"]}
+{"id":"messy-025","prompt":"eng channel needs to know the release is ready ship ittt","expected_tools":["slack_send_message"]}
+{"id":"messy-026","prompt":"email customer some vague update abt their escalation pls","expected_tools":["gmail_send_email"]}
+{"id":"messy-027","prompt":"finance wanted reconciliation notes in email form for some reason","expected_tools":["gmail_send_email"]}
+{"id":"messy-028","prompt":"send interview schedule to the hiring ppl for tomorrow","expected_tools":["gmail_send_email"]}
+{"id":"messy-029","prompt":"follow up w vendor abt signed contract i think legal forgot","expected_tools":["gmail_send_email"]}
+{"id":"messy-030","prompt":"blast beta users w the new feature announcement thing","expected_tools":["gmail_send_email"]}
+{"id":"messy-031","prompt":"book support team sometime tomorrow afternoon idc where","expected_tools":["calendar_create_event"]}
+{"id":"messy-032","prompt":"throw a retro on the calendar friday before ppl disappear","expected_tools":["calendar_create_event"]}
+{"id":"messy-033","prompt":"need kickoff call next tuesday w alex + priya + customer folks","expected_tools":["calendar_create_event"]}
+{"id":"messy-034","prompt":"schedule the security review w compliance whenever everyones free","expected_tools":["calendar_create_event"]}
+{"id":"messy-035","prompt":"put a hold on calendars tonight for deploy window dont let ppl book over it","expected_tools":["calendar_create_event"]}
+{"id":"messy-036","prompt":"find literally any 30min slot for product sync next week","expected_tools":["calendar_find_availability"]}
+{"id":"messy-037","prompt":"when are sam n morgan both free tomorrow? this shouldnt be hard","expected_tools":["calendar_find_availability"]}
+{"id":"messy-038","prompt":"need customer call before thursday squeeze it somewhere","expected_tools":["calendar_find_availability"]}
+{"id":"messy-039","prompt":"leadership calendars are insane find an open hr this afternoon somehow","expected_tools":["calendar_find_availability"]}
+{"id":"messy-040","prompt":"need a slot for data review w 3 ppl just find one","expected_tools":["calendar_find_availability"]}
+{"id":"messy-041","prompt":"run sql or whatever for yesterdays failed jobs","expected_tools":["postgres_query"]}
+{"id":"messy-042","prompt":"can we see revenue by plan for the last week from the db","expected_tools":["postgres_query"]}
+{"id":"messy-043","prompt":"which users churned after trial expired? query the db pls","expected_tools":["postgres_query"]}
+{"id":"messy-044","prompt":"top 5 accounts by invoice volume go pull it from postgres","expected_tools":["postgres_query"]}
+{"id":"messy-045","prompt":"count api errors by endpoint for today i need it for a slide","expected_tools":["postgres_query"]}
+{"id":"messy-046","prompt":"need WAU by region from warehouse asap exec meeting in 10","expected_tools":["bigquery_run_query"]}
+{"id":"messy-047","prompt":"what acquisition channels are converting best rn? pull warehouse numbers","expected_tools":["bigquery_run_query"]}
+{"id":"messy-048","prompt":"calc retention for march cohort from bigquery thing","expected_tools":["bigquery_run_query"]}
+{"id":"messy-049","prompt":"support ticket volume by product area pls analytics query it","expected_tools":["bigquery_run_query"]}
+{"id":"messy-050","prompt":"enterprise acct usage growth numbers?? should be in bq somewhere","expected_tools":["bigquery_run_query"]}
+{"id":"messy-051","prompt":"make a checkout link for annual plan customer is waiting","expected_tools":["stripe_create_checkout"]}
+{"id":"messy-052","prompt":"need payment link for the upgrade invoice asap","expected_tools":["stripe_create_checkout"]}
+{"id":"messy-053","prompt":"customer wants 3 enterprise seats send em checkout thing","expected_tools":["stripe_create_checkout"]}
+{"id":"messy-054","prompt":"make discounted beta subscription payment page or whatever","expected_tools":["stripe_create_checkout"]}
+{"id":"messy-055","prompt":"need onboarding package payment link before sales loses the deal","expected_tools":["stripe_create_checkout"]}
+{"id":"messy-056","prompt":"refund that duplicate payment from yesterday before finance freaks out","expected_tools":["stripe_refund_payment"]}
+{"id":"messy-057","prompt":"partial refund for setup fee bc onboarding failed","expected_tools":["stripe_refund_payment"]}
+{"id":"messy-058","prompt":"refund customers last card payment they asked for it","expected_tools":["stripe_refund_payment"]}
+{"id":"messy-059","prompt":"annual sub got cancelled just refund em already","expected_tools":["stripe_refund_payment"]}
+{"id":"messy-060","prompt":"Acme got overcharged again pls refund that invoice","expected_tools":["stripe_refund_payment"]}
+{"id":"messy-061","prompt":"new trial lead came in add em to crm","expected_tools":["hubspot_create_contact"]}
+{"id":"messy-062","prompt":"put webinar attendee into hubspot w company details","expected_tools":["hubspot_create_contact"]}
+{"id":"messy-063","prompt":"enterprise prospect needs diff owner in hubspot can u swap it","expected_tools":["hubspot_create_contact"]}
+{"id":"messy-064","prompt":"create contact for inbound demo request before sales complains","expected_tools":["hubspot_create_contact"]}
+{"id":"messy-065","prompt":"partner lead should be marked MQL in hubspot","expected_tools":["hubspot_create_contact"]}
+{"id":"messy-066","prompt":"move the sales opp to contract sent","expected_tools":["salesforce_update_opportunity"]}
+{"id":"messy-067","prompt":"acme close date changed again update salesforce pls","expected_tools":["salesforce_update_opportunity"]}
+{"id":"messy-068","prompt":"add procurement call notes to the deal record","expected_tools":["salesforce_update_opportunity"]}
+{"id":"messy-069","prompt":"expansion deal amount changed update it in sf","expected_tools":["salesforce_update_opportunity"]}
+{"id":"messy-070","prompt":"deal closed won finally mark it","expected_tools":["salesforce_update_opportunity"]}
+{"id":"messy-071","prompt":"google competitor pricing stuff i need references for a deck","expected_tools":["web_search"]}
+{"id":"messy-072","prompt":"find docs abt oauth device flow limits im too tired to search","expected_tools":["web_search"]}
+{"id":"messy-073","prompt":"need examples of soc2 vendor questionnaires from the internet","expected_tools":["web_search"]}
+{"id":"messy-074","prompt":"what are hosted vector dbs charging these days","expected_tools":["web_search"]}
+{"id":"messy-075","prompt":"any big api outages recently? need examples","expected_tools":["web_search"]}
+{"id":"messy-076","prompt":"pull text outta this signed contract pdf n tell me renewal terms","expected_tools":["pdf_extract_text"]}
+{"id":"messy-077","prompt":"what's the due date in this invoice pdf","expected_tools":["pdf_extract_text"]}
+{"id":"messy-078","prompt":"extract the answers from this security questionnaire pdf thing","expected_tools":["pdf_extract_text"]}
+{"id":"messy-079","prompt":"grab the fee table from the vendor agreement pdf pls","expected_tools":["pdf_extract_text"]}
+{"id":"messy-080","prompt":"summarize this board deck pdf im not reading all that","expected_tools":["pdf_extract_text"]}
+{"id":"messy-081","prompt":"make a notion page for the incident postmortem before we forget","expected_tools":["notion_create_page"]}
+{"id":"messy-082","prompt":"need a notion spec page for import workflow changes","expected_tools":["notion_create_page"]}
+{"id":"messy-083","prompt":"throw customer discovery notes into notion somewhere","expected_tools":["notion_create_page"]}
+{"id":"messy-084","prompt":"write up the release checklist in notion","expected_tools":["notion_create_page"]}
+{"id":"messy-085","prompt":"add api pagination docs to the team wiki thing","expected_tools":["notion_create_page"]}
+{"id":"messy-086","prompt":"upload the csv report to s3 analytics bucket","expected_tools":["s3_upload_file"]}
+{"id":"messy-087","prompt":"put exported invoices in the monthly reports bucket pls","expected_tools":["s3_upload_file"]}
+{"id":"messy-088","prompt":"backup archive needs to go into ops storage","expected_tools":["s3_upload_file"]}
+{"id":"messy-089","prompt":"store this customer attachment privately in s3","expected_tools":["s3_upload_file"]}
+{"id":"messy-090","prompt":"upload compliance evidence zip to audit bucket before friday","expected_tools":["s3_upload_file"]}
+{"id":"messy-091","prompt":"customer cant log in make a support ticket","expected_tools":["zendesk_create_ticket"]}
+{"id":"messy-092","prompt":"payment failures again open a high prio zendesk thing","expected_tools":["zendesk_create_ticket"]}
+{"id":"messy-093","prompt":"customer missing invoice email create support case pls","expected_tools":["zendesk_create_ticket"]}
+{"id":"messy-094","prompt":"need a ticket for workspace export request","expected_tools":["zendesk_create_ticket"]}
+{"id":"messy-095","prompt":"enterprise customer has sso setup questions open support case","expected_tools":["zendesk_create_ticket"]}
+{"id":"messy-096","prompt":"check datadog for api 500 spam in the last hr","expected_tools":["datadog_query_logs"]}
+{"id":"messy-097","prompt":"checkout service latency looked awful can u see what dd says","expected_tools":["datadog_query_logs"]}
+{"id":"messy-098","prompt":"look for failed login attempts from this morning in the logs","expected_tools":["datadog_query_logs"]}
+{"id":"messy-099","prompt":"what happened during deploy window? check metrics/logs","expected_tools":["datadog_query_logs"]}
+{"id":"messy-100","prompt":"error rates by region from datadog pls execs are asking","expected_tools":["datadog_query_logs"]}
