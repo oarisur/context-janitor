@@ -10,9 +10,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+VERSION = ""
 
 
 def main() -> int:
+    global VERSION
+    VERSION = _project_version()
     parser = argparse.ArgumentParser(description="Run the full Context Janitor release gate.")
     parser.add_argument(
         "--skip-wheel-smoke",
@@ -208,7 +211,8 @@ def _run(name: str, command: list[str]) -> int:
 
 
 def _inspect_sdist() -> None:
-    sdist = ROOT / "dist" / "context_janitor-0.1.0.tar.gz"
+    package_root = f"context_janitor-{VERSION}"
+    sdist = ROOT / "dist" / f"{package_root}.tar.gz"
     if not sdist.exists():
         raise RuntimeError(f"missing expected sdist: {sdist}")
 
@@ -216,20 +220,20 @@ def _inspect_sdist() -> None:
         names = archive.getnames()
 
     required = {
-        "context_janitor-0.1.0/docs/production-rollout.md",
-        "context_janitor-0.1.0/examples/agent_logs.example.jsonl",
-        "context_janitor-0.1.0/examples/messy_aliases.janitor.yaml",
-        "context_janitor-0.1.0/examples/messy_production_evals.jsonl",
-        "context_janitor-0.1.0/examples/ollama_agent.py",
-        "context_janitor-0.1.0/examples/request.example.json",
-        "context_janitor-0.1.0/examples/simulated_agent_logs.jsonl",
-        "context_janitor-0.1.0/examples/simulated_production_evals.json",
-        "context_janitor-0.1.0/examples/simulated_production_tools.json",
-        "context_janitor-0.1.0/scripts/eval_agent.py",
-        "context_janitor-0.1.0/scripts/generate_simulated_data.py",
-        "context_janitor-0.1.0/scripts/prepare_evals.py",
-        "context_janitor-0.1.0/scripts/roi_reporter.py",
-        "context_janitor-0.1.0/src/context_janitor/py.typed",
+        f"{package_root}/docs/production-rollout.md",
+        f"{package_root}/examples/agent_logs.example.jsonl",
+        f"{package_root}/examples/messy_aliases.janitor.yaml",
+        f"{package_root}/examples/messy_production_evals.jsonl",
+        f"{package_root}/examples/ollama_agent.py",
+        f"{package_root}/examples/request.example.json",
+        f"{package_root}/examples/simulated_agent_logs.jsonl",
+        f"{package_root}/examples/simulated_production_evals.json",
+        f"{package_root}/examples/simulated_production_tools.json",
+        f"{package_root}/scripts/eval_agent.py",
+        f"{package_root}/scripts/generate_simulated_data.py",
+        f"{package_root}/scripts/prepare_evals.py",
+        f"{package_root}/scripts/roi_reporter.py",
+        f"{package_root}/src/context_janitor/py.typed",
     }
     missing = sorted(required - set(names))
     if missing:
@@ -281,6 +285,14 @@ def _latest_wheel() -> Path:
     if not wheels:
         raise RuntimeError("no built wheel found in dist")
     return wheels[-1]
+
+
+def _project_version() -> str:
+    for line in (ROOT / "pyproject.toml").read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("version = "):
+            return stripped.split("=", 1)[1].strip().strip('"')
+    raise RuntimeError("Could not find project version in pyproject.toml")
 
 
 def _venv_python(path: Path) -> Path:

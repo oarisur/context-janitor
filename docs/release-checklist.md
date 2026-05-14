@@ -32,4 +32,4 @@ Manual release tasks:
 - Review `docs/production-rollout.md`
 - Replace example eval data with real production eval data for app-specific gates
 - Render or update `assets/terminal-demo.svg` if CLI output changed
-- Create a matching Git tag, such as `v0.1.0`
+- Create a matching Git tag, such as `v1.0.0rc1`

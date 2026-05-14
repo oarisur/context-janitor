@@ -769,9 +769,9 @@ python scripts\release_check.py
 
 ## Release Checklist
 
-- Confirm `version = "0.1.0"` in [pyproject.toml](pyproject.toml).
+- Confirm the release version in [pyproject.toml](pyproject.toml).
 - Run [Release Checklist](docs/release-checklist.md).
-- Create a matching GitHub release tag, for example `v0.1.0`.
+- Create a matching GitHub release tag, for example `v1.0.0rc1`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
 - Build the wheel and source distribution.
