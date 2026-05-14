@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -22,12 +22,14 @@ class JanitorConfig:
     format: str = "json"
     price_per_million_tokens: float = 5.0
     keep: tuple[str, ...] = ()
+    aliases: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "provider", self.provider.lower())
         object.__setattr__(self, "fallback", self.fallback.lower())
         object.__setattr__(self, "log_level", self.log_level.upper())
         object.__setattr__(self, "format", self.format.lower())
+        object.__setattr__(self, "aliases", _aliases(self.aliases))
 
         if self.provider not in PROVIDERS:
             raise ValueError(f"provider must be one of: {', '.join(sorted(PROVIDERS))}.")
@@ -43,10 +45,6 @@ class JanitorConfig:
             raise ValueError("timeout_ms must be greater than zero.")
         if self.price_per_million_tokens < 0:
             raise ValueError("price_per_million_tokens must be zero or greater.")
-
-
-DEFAULT_CONFIG = JanitorConfig()
-
 
 def load_config(start: Path | None = None, explicit_path: str | None = None) -> JanitorConfig:
     path = Path(explicit_path) if explicit_path else find_config(start or Path.cwd())
@@ -66,6 +64,7 @@ def load_config(start: Path | None = None, explicit_path: str | None = None) -> 
             values.get("price_per_million_tokens", DEFAULT_CONFIG.price_per_million_tokens)
         ),
         keep=_tuple(values.get("keep", DEFAULT_CONFIG.keep)),
+        aliases=_aliases(values.get("aliases", DEFAULT_CONFIG.aliases)),
     )
 
 
@@ -87,14 +86,32 @@ def merge_config(config: JanitorConfig, overrides: dict[str, Any]) -> JanitorCon
 
 def _read_simple_yaml(path: Path) -> dict[str, Any]:
     values: dict[str, Any] = {}
+    section: str | None = None
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
+        indent = len(line) - len(line.lstrip(" "))
+        if indent and section == "aliases":
+            if ":" not in stripped:
+                raise ValueError(f"{path}:{line_number}: expected 'alias: terms'.")
+            key, raw_value = stripped.split(":", 1)
+            aliases = values.setdefault("aliases", {})
+            if not isinstance(aliases, dict):
+                raise ValueError(f"{path}:{line_number}: aliases must be a mapping.")
+            aliases[key.strip()] = _tuple(_parse_scalar(raw_value.strip()))
+            continue
+        section = None
         if ":" not in stripped:
             raise ValueError(f"{path}:{line_number}: expected 'key: value'.")
         key, raw_value = stripped.split(":", 1)
-        values[key.strip()] = _parse_scalar(raw_value.strip())
+        key = key.strip()
+        parsed = _parse_scalar(raw_value.strip())
+        if key == "aliases" and parsed is None:
+            values[key] = {}
+            section = key
+        else:
+            values[key] = parsed
     return values
 
 
@@ -140,3 +157,21 @@ def _tuple(value: Any) -> tuple[str, ...]:
     if isinstance(value, (list, tuple)):
         return tuple(str(item).strip() for item in value if str(item).strip())
     return tuple(part.strip() for part in str(value).split(",") if part.strip())
+
+
+def _aliases(value: Any) -> dict[str, tuple[str, ...]]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError("aliases must be a mapping of prompt terms to comma-separated terms.")
+
+    aliases = {}
+    for raw_key, raw_terms in value.items():
+        key = str(raw_key).strip().lower()
+        terms = tuple(term.lower() for term in _tuple(raw_terms))
+        if key and terms:
+            aliases[key] = terms
+    return aliases
+
+
+DEFAULT_CONFIG = JanitorConfig()

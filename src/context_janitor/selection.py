@@ -9,7 +9,7 @@ from .cache import get_cached_selection, store_selection
 from .metrics import PruneMetrics, estimate_metrics
 from .models import Tool
 from .providers import ProviderError, select_with_provider
-from .ranker import select_tools
+from .ranker import PromptAliases, select_tools
 
 
 @dataclass(frozen=True)
@@ -36,6 +36,7 @@ def select_resilient(
     logger: logging.Logger | None = None,
     price_per_million_tokens: float = 5.0,
     keep: tuple[str, ...] | list[str] = (),
+    prompt_aliases: PromptAliases | None = None,
 ) -> SelectionResult:
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
@@ -47,7 +48,7 @@ def select_resilient(
     keep_names = tuple(name for name in keep if name)
 
     if cache_enabled and not keep_names:
-        cache_entry = get_cached_selection(prompt, tools, provider, model, limit)
+        cache_entry = get_cached_selection(prompt, tools, provider, model, limit, prompt_aliases=prompt_aliases)
         cached = _tools_by_names(cache_entry.names if cache_entry else [], tools, limit)
         if cached:
             metrics = estimate_metrics(tools, cached, price_per_million_tokens)
@@ -68,7 +69,7 @@ def select_resilient(
             )
 
     try:
-        selected = select_with_provider(provider, prompt, tools, limit, model, timeout_ms / 1000)
+        selected = select_with_provider(provider, prompt, tools, limit, model, timeout_ms / 1000, prompt_aliases)
         actual_provider = provider
         fallback_used = False
         warning = None
@@ -77,7 +78,7 @@ def select_resilient(
             raise
         warning = f"{provider} unavailable; fell back to heuristic: {error}"
         logger.warning(warning)
-        selected = select_tools(prompt, tools, limit)
+        selected = select_tools(prompt, tools, limit, prompt_aliases)
         actual_provider = "heuristic"
         fallback_used = True
 
@@ -85,7 +86,7 @@ def select_resilient(
 
     if cache_enabled and not keep_names:
         try:
-            store_selection(prompt, tools, selected, provider, model, limit)
+            store_selection(prompt, tools, selected, provider, model, limit, prompt_aliases=prompt_aliases)
         except OSError as error:
             logger.warning("Could not write cache: %s", error)
 
@@ -114,6 +115,7 @@ async def select_resilient_async(
     logger: logging.Logger | None = None,
     price_per_million_tokens: float = 5.0,
     keep: tuple[str, ...] | list[str] = (),
+    prompt_aliases: PromptAliases | None = None,
 ) -> SelectionResult:
     return await asyncio.to_thread(
         select_resilient,
@@ -128,6 +130,7 @@ async def select_resilient_async(
         logger,
         price_per_million_tokens,
         keep,
+        prompt_aliases,
     )
 
 

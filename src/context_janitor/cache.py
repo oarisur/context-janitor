@@ -10,7 +10,7 @@ from time import time
 from typing import Any
 
 from .models import Tool
-from .ranker import tokens
+from .ranker import PromptAliases, tokens
 
 
 @dataclass(frozen=True)
@@ -59,11 +59,13 @@ def get_cached_selection(
     limit: int,
     cache_path: Path | None = None,
     similarity_threshold: float = 0.92,
+    prompt_aliases: PromptAliases | None = None,
 ) -> CacheEntry | None:
     path = cache_path or default_cache_path()
     payload = _read_cache(path)
     catalog_hash = _catalog_hash(tools)
-    exact_key = _entry_key(prompt, catalog_hash, provider, model, limit)
+    alias_hash = _aliases_hash(prompt_aliases)
+    exact_key = _entry_key(prompt, catalog_hash, provider, model, limit, alias_hash)
     exact = payload.get(exact_key)
     if exact:
         return CacheEntry(names=list(exact.get("names", [])), similarity=1.0)
@@ -75,6 +77,8 @@ def get_cached_selection(
     best: CacheEntry | None = None
     for entry in payload.values():
         if entry.get("catalog_hash") != catalog_hash:
+            continue
+        if entry.get("alias_hash", "") != alias_hash:
             continue
         if entry.get("provider") != provider or entry.get("model") != model or entry.get("limit") != limit:
             continue
@@ -93,14 +97,17 @@ def store_selection(
     model: str | None,
     limit: int,
     cache_path: Path | None = None,
+    prompt_aliases: PromptAliases | None = None,
 ) -> None:
     path = cache_path or default_cache_path()
     payload = _read_cache(path)
     catalog_hash = _catalog_hash(tools)
-    payload[_entry_key(prompt, catalog_hash, provider, model, limit)] = {
+    alias_hash = _aliases_hash(prompt_aliases)
+    payload[_entry_key(prompt, catalog_hash, provider, model, limit, alias_hash)] = {
         "prompt": prompt,
         "prompt_tokens": tokens(prompt),
         "catalog_hash": catalog_hash,
+        "alias_hash": alias_hash,
         "provider": provider,
         "model": model,
         "limit": limit,
@@ -151,10 +158,25 @@ def _catalog_hash(tools: list[Tool]) -> str:
     return hashlib.sha256(json.dumps(catalog, sort_keys=True).encode("utf-8")).hexdigest()
 
 
-def _entry_key(prompt: str, catalog_hash: str, provider: str, model: str | None, limit: int) -> str:
+def _aliases_hash(prompt_aliases: PromptAliases | None) -> str:
+    if not prompt_aliases:
+        return ""
+    payload = {key: list(values) for key, values in sorted(prompt_aliases.items())}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _entry_key(
+    prompt: str,
+    catalog_hash: str,
+    provider: str,
+    model: str | None,
+    limit: int,
+    alias_hash: str,
+) -> str:
     payload = {
         "prompt": prompt,
         "catalog_hash": catalog_hash,
+        "alias_hash": alias_hash,
         "provider": provider,
         "model": model,
         "limit": limit,

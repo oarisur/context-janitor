@@ -55,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         description="Proxy an MCP stdio server and prune tools/list responses with Context Janitor.",
     )
     mcp_proxy.add_argument("--prompt", help="Task prompt used to rank downstream MCP tools.")
+    mcp_proxy.add_argument("--config", help="Path to .janitor.yaml for custom prompt aliases.")
     mcp_proxy.add_argument("--limit", type=int, default=5)
     mcp_proxy.add_argument(
         "--provider",
@@ -111,6 +112,7 @@ def _prune(args: argparse.Namespace) -> int:
         logger,
         config.price_per_million_tokens,
         config.keep,
+        config.aliases,
     )
     _log_metrics(logger, result)
     _write_output(result, tools, config, prompt, args.explain)
@@ -190,6 +192,7 @@ def _middleware(args: argparse.Namespace) -> int:
         logger,
         config.price_per_million_tokens,
         config.keep,
+        config.aliases,
     )
     _log_metrics(logger, result)
     if args.dry_run:
@@ -199,13 +202,15 @@ def _middleware(args: argparse.Namespace) -> int:
         return 0
     payload["tools"] = raw_tools(result.selected)
     if args.explain:
-        payload["_janitor"] = {"explain": _explain_payload(prompt, tools, config.limit)}
+        payload["_janitor"] = {"explain": _explain_payload(prompt, tools, config.limit, config.aliases)}
     json.dump(payload, sys.stdout, indent=2)
     sys.stdout.write("\n")
     return 0
 
 
 def _mcp_proxy(args: argparse.Namespace) -> int:
+    config = load_config(explicit_path=args.config)
+    args.aliases = config.aliases
     prompt = args.prompt or os.environ.get("JANITOR_PROMPT")
     if not prompt:
         print("error: --prompt or JANITOR_PROMPT is required.", file=sys.stderr)
@@ -232,14 +237,14 @@ def _write_output(
         for tool in result.selected:
             print(tool.name)
         if explain:
-            _write_explain_stderr(prompt, tools, config.limit)
+            _write_explain_stderr(prompt, tools, config.limit, config.aliases)
         return
 
     if config.format == "raw":
         json.dump(raw_tools(result.selected), sys.stdout, indent=2)
         sys.stdout.write("\n")
         if explain:
-            _write_explain_stderr(prompt, tools, config.limit)
+            _write_explain_stderr(prompt, tools, config.limit, config.aliases)
         return
 
     payload: dict[str, Any] = {
@@ -267,7 +272,7 @@ def _write_output(
     if result.warning:
         payload["metadata"]["warning"] = result.warning
     if explain:
-        payload["explain"] = _explain_payload(prompt, tools, config.limit)
+        payload["explain"] = _explain_payload(prompt, tools, config.limit, config.aliases)
     json.dump(payload, sys.stdout, indent=2)
     sys.stdout.write("\n")
 
@@ -448,7 +453,12 @@ def _schema_warnings(tool: Any) -> list[str]:
     return warnings
 
 
-def _explain_payload(prompt: str, tools: list[Any], limit: int) -> list[dict[str, Any]]:
+def _explain_payload(
+    prompt: str,
+    tools: list[Any],
+    limit: int,
+    aliases: dict[str, tuple[str, ...]] | None = None,
+) -> list[dict[str, Any]]:
     return [
         {
             "name": item.tool.name,
@@ -457,12 +467,17 @@ def _explain_payload(prompt: str, tools: list[Any], limit: int) -> list[dict[str
             "matched_terms": item.matched_terms,
             "top_terms": item.top_terms,
         }
-        for item in explain_tools(prompt, tools, limit)
+        for item in explain_tools(prompt, tools, limit, aliases)
     ]
 
 
-def _write_explain_stderr(prompt: str, tools: list[Any], limit: int) -> None:
-    for item in _explain_payload(prompt, tools, limit):
+def _write_explain_stderr(
+    prompt: str,
+    tools: list[Any],
+    limit: int,
+    aliases: dict[str, tuple[str, ...]] | None = None,
+) -> None:
+    for item in _explain_payload(prompt, tools, limit, aliases):
         status = "kept" if item["selected"] else "pruned"
         terms = ", ".join(item["matched_terms"]) or "none"
         print(

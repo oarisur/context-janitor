@@ -53,6 +53,45 @@ class CacheTest(unittest.TestCase):
         self.assertEqual(len(payload), 1)
         self.assertEqual(temp_files, [])
 
+    def test_cache_key_includes_prompt_aliases(self):
+        tools = [
+            Tool("bigquery_run_query", "Run an analytical BigQuery SQL query."),
+            Tool("gmail_send", "Send email."),
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / "cache.json"
+            store_selection(
+                "pull bq numbers",
+                tools,
+                [tools[0]],
+                "heuristic",
+                None,
+                1,
+                cache_path,
+                prompt_aliases={"bq": ("bigquery", "query")},
+            )
+
+            entry_without_aliases = get_cached_selection(
+                "pull bq numbers",
+                tools,
+                "heuristic",
+                None,
+                1,
+                cache_path,
+            )
+            entry_with_aliases = get_cached_selection(
+                "pull bq numbers",
+                tools,
+                "heuristic",
+                None,
+                1,
+                cache_path,
+                prompt_aliases={"bq": ("bigquery", "query")},
+            )
+
+        self.assertIsNone(entry_without_aliases)
+        self.assertIsNotNone(entry_with_aliases)
+
 
 if __name__ == "__main__":
     unittest.main()

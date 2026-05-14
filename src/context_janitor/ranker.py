@@ -38,66 +38,29 @@ STOP_WORDS = {
 }
 
 PROMPT_ALIASES = {
-    "acct": ("account",),
     "appointment": ("calendar", "event"),
-    "archive": ("upload", "file", "s3", "bucket"),
-    "analytics": ("bigquery", "query", "warehouse"),
     "available": ("availability", "calendar", "slots"),
     "bug": ("github", "issues"),
     "bugs": ("github", "issues"),
-    "bq": ("bigquery", "query", "warehouse"),
-    "blast": ("email", "send", "announcement"),
-    "bucket": ("s3", "upload", "file"),
-    "charging": ("pricing", "web", "search"),
     "charge": ("stripe", "checkout"),
     "charges": ("stripe", "checkout"),
     "checkout": ("stripe", "payment"),
-    "count": ("postgres", "sql", "query"),
-    "crm": ("hubspot", "contact"),
     "database": ("postgres", "query"),
-    "dashboard": ("linear", "issue", "task"),
     "db": ("postgres", "query"),
     "docs": ("documentation",),
     "email": ("gmail",),
     "emails": ("gmail",),
-    "endpoint": ("postgres", "sql", "query"),
-    "file": ("linear", "issue"),
-    "follow": ("email", "send"),
     "free": ("availability", "calendar", "slots"),
-    "hr": ("hour", "availability", "calendar"),
     "internet": ("web", "search", "public"),
-    "kickoff": ("calendar", "event"),
-    "limits": ("linear", "issue", "documentation"),
     "meeting": ("calendar", "event"),
     "meetings": ("calendar", "event"),
-    "mql": ("hubspot", "contact", "lifecycle"),
-    "onboarding": ("linear", "issue"),
-    "oncall": ("slack", "message"),
-    "ops": ("operations", "s3", "bucket"),
-    "opp": ("salesforce", "opportunity"),
-    "outages": ("web", "search", "news"),
     "payment": ("stripe", "checkout"),
     "payments": ("stripe", "checkout"),
-    "pagination": ("linear", "issue", "task"),
-    "prio": ("priority", "linear", "issue"),
     "pr": ("pull", "request"),
     "pricing": ("web", "search", "current"),
-    "qa": ("jira", "transition", "ticket"),
-    "ready": ("jira", "transition", "ticket"),
     "slot": ("availability", "calendar", "slots"),
-    "squeeze": ("availability", "calendar", "slots"),
     "schedule": ("calendar", "event"),
-    "sf": ("salesforce", "opportunity"),
     "sql": ("postgres", "query"),
-    "storage": ("s3", "bucket", "upload"),
-    "task": ("linear", "issue"),
-    "tell": ("slack", "message"),
-    "threads": ("github", "issues"),
-    "ticket": ("linear", "jira", "zendesk", "issue"),
-    "tickets": ("linear", "jira", "zendesk", "issue"),
-    "update": ("slack", "message"),
-    "vendor": ("email",),
-    "wau": ("weekly", "active", "teams", "bigquery"),
     "warehouse": ("bigquery", "analytics", "query", "reports", "dashboards"),
 }
 
@@ -111,13 +74,21 @@ class ToolExplanation:
     top_terms: list[str]
 
 
-def select_tools(prompt: str, tools: list[Tool], limit: int = 5) -> list[Tool]:
+PromptAliases = dict[str, tuple[str, ...]]
+
+
+def select_tools(
+    prompt: str,
+    tools: list[Tool],
+    limit: int = 5,
+    prompt_aliases: PromptAliases | None = None,
+) -> list[Tool]:
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
     if len(tools) <= limit:
         return tools
 
-    prompt_terms = _expand_prompt_terms(_tokens(prompt))
+    prompt_terms = _expand_prompt_terms(_tokens(prompt), prompt_aliases)
     if not prompt_terms:
         return tools[:limit]
 
@@ -133,11 +104,16 @@ def select_tools(prompt: str, tools: list[Tool], limit: int = 5) -> list[Tool]:
     return [tool for score, _, tool in scored[:limit] if score > 0] or tools[:limit]
 
 
-def explain_tools(prompt: str, tools: list[Tool], limit: int = 5) -> list[ToolExplanation]:
+def explain_tools(
+    prompt: str,
+    tools: list[Tool],
+    limit: int = 5,
+    prompt_aliases: PromptAliases | None = None,
+) -> list[ToolExplanation]:
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
 
-    prompt_terms = _expand_prompt_terms(_tokens(prompt))
+    prompt_terms = _expand_prompt_terms(_tokens(prompt), prompt_aliases)
     document_terms = [_tokens(tool.searchable_text) for tool in tools]
     document_frequency = Counter(term for terms in document_terms for term in set(terms))
     scored = []
@@ -238,8 +214,9 @@ def tokens(text: str) -> list[str]:
     return _tokens(text)
 
 
-def _expand_prompt_terms(prompt_terms: list[str]) -> list[str]:
+def _expand_prompt_terms(prompt_terms: list[str], prompt_aliases: PromptAliases | None = None) -> list[str]:
     expanded = list(prompt_terms)
+    aliases = PROMPT_ALIASES | (prompt_aliases or {})
     for term in prompt_terms:
-        expanded.extend(PROMPT_ALIASES.get(term, ()))
+        expanded.extend(aliases.get(term, ()))
     return expanded

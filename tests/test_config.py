@@ -35,6 +35,25 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(config.log_level, "INFO")
         self.assertEqual(config.keep, ("log_error", "notify_admin"))
 
+    def test_load_config_reads_alias_section(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / ".janitor.yaml"
+            path.write_text(
+                "\n".join(
+                    [
+                        "aliases:",
+                        "  bq: bigquery,query,warehouse",
+                        "  blast: email,send",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            config = load_config(explicit_path=str(path))
+
+        self.assertEqual(config.aliases["bq"], ("bigquery", "query", "warehouse"))
+        self.assertEqual(config.aliases["blast"], ("email", "send"))
+
     def test_load_config_normalizes_case(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / ".janitor.yaml"

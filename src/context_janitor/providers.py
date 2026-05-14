@@ -9,7 +9,7 @@ import urllib.request
 from typing import Any
 
 from .models import Tool
-from .ranker import select_tools
+from .ranker import PromptAliases, select_tools
 
 
 class ProviderError(RuntimeError):
@@ -23,6 +23,7 @@ def select_with_provider(
     limit: int,
     model: str | None = None,
     timeout_seconds: float = 0.8,
+    prompt_aliases: PromptAliases | None = None,
 ) -> list[Tool]:
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
@@ -30,7 +31,7 @@ def select_with_provider(
     provider = provider.lower()
     try:
         if provider == "heuristic":
-            return select_tools(prompt, tools, limit)
+            return select_tools(prompt, tools, limit, prompt_aliases)
         if provider == "openai":
             names = _select_openai(prompt, tools, limit, model, timeout_seconds)
         elif provider == "anthropic":
@@ -42,7 +43,7 @@ def select_with_provider(
     except (KeyError, IndexError, TypeError) as error:
         raise ProviderError(f"{provider} returned a malformed response.") from error
 
-    return _tools_by_names(names, tools, limit) or select_tools(prompt, tools, limit)
+    return _tools_by_names(names, tools, limit) or select_tools(prompt, tools, limit, prompt_aliases)
 
 
 def _select_openai(

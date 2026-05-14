@@ -8,6 +8,7 @@ from argparse import Namespace
 from typing import Any, TextIO
 
 from .models import load_tools, raw_tools
+from .ranker import PromptAliases
 from .selection import select_resilient
 
 
@@ -67,6 +68,7 @@ def run_proxy(
                         model=args.model,
                         fallback=args.fallback,
                         timeout_ms=args.timeout_ms,
+                        prompt_aliases=getattr(args, "aliases", None),
                     )
                     line = json.dumps(message, separators=(",", ":")) + "\n"
             stdout.write(line)
@@ -91,6 +93,7 @@ def prune_tools_list_response(
     model: str | None = None,
     fallback: str = "heuristic",
     timeout_ms: int = 800,
+    prompt_aliases: PromptAliases | None = None,
 ) -> dict[str, Any]:
     result = message.get("result")
     if not isinstance(result, dict) or not isinstance(result.get("tools"), list):
@@ -105,6 +108,7 @@ def prune_tools_list_response(
         model=model,
         fallback=fallback,
         timeout_ms=timeout_ms,
+        prompt_aliases=prompt_aliases,
     )
     return {
         **message,

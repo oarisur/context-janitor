@@ -60,8 +60,9 @@ Benchmark notes:
   making production claims.
 
 The repository also includes `examples/messy_production_evals.jsonl`, a 100-case prompt pack with
-informal, ambiguous workplace phrasing. The release gate requires the local heuristic to keep the
-expected tool for every messy case against the simulated production catalog.
+informal, ambiguous workplace phrasing, plus `examples/messy_aliases.janitor.yaml` for team slang.
+The release gate requires the local heuristic to keep the expected tool for every messy case
+against the simulated production catalog when that alias config is provided.
 
 To display measured agent success rates:
 
@@ -313,10 +314,14 @@ log_level: INFO
 format: json
 price_per_million_tokens: 5.0
 keep: log_error,notify_admin
+aliases:
+  bq: bigquery,query,warehouse
+  blast: email,send
+  prio: priority
 ```
 
-The config parser intentionally supports a simple flat `key: value` format. It is enough for the
-settings above, but it is not a full YAML implementation.
+The config parser intentionally supports simple top-level `key: value` settings plus the `aliases`
+mapping shown above. It is not a full YAML implementation.
 
 CLI flags override config values.
 
@@ -332,6 +337,11 @@ CLI flags override config values.
 | `format` | `json` | `prune` output format: `json`, `names`, or `raw` |
 | `price_per_million_tokens` | `5.0` | Price used for savings estimates |
 | `keep` | empty | Comma-separated tool names that must stay selected |
+| `aliases` | empty | Team-specific prompt slang to expand before ranking |
+
+Use `aliases` for vocabulary your tool descriptions do not already cover. For example, if your team
+types `bq` but your tool says `BigQuery`, map `bq` to `bigquery,query,warehouse` in config instead
+of hardcoding that slang into Context Janitor.
 
 ## Required Tools
 

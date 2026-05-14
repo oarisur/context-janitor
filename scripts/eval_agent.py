@@ -11,6 +11,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from context_janitor.config import load_config  # noqa: E402
 from context_janitor.models import load_tools, raw_tools  # noqa: E402
 from context_janitor.selection import select_resilient  # noqa: E402
 
@@ -40,6 +41,7 @@ def main() -> int:
         help="Fail if any Janitor provider falls below this success-rate delta versus baseline.",
     )
     parser.add_argument("--format", choices=["table", "json"], default="table")
+    parser.add_argument("--config", help="Optional .janitor.yaml file for custom prompt aliases.")
     parser.add_argument(
         "command",
         nargs=argparse.REMAINDER,
@@ -52,6 +54,7 @@ def main() -> int:
         print("error: agent command is required after --.", file=sys.stderr)
         return 2
 
+    config = load_config(explicit_path=args.config)
     tools = load_tools(_read_json(args.tools))
     cases = _read_cases(args.evals)
     baseline = _run_mode(
@@ -76,6 +79,7 @@ def main() -> int:
                     timeout_ms=args.timeout_ms,
                     fallback=args.fallback,
                     cache_enabled=False,
+                    prompt_aliases=config.aliases,
                 ).selected
             )
             for case in cases

@@ -7,3 +7,7 @@ timeout_ms: 800
 log_level: INFO
 price_per_million_tokens: 5.00
 keep: log_error,notify_admin
+aliases:
+  bq: bigquery,query,warehouse
+  blast: email,send
+  prio: priority

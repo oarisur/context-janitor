@@ -10,6 +10,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from context_janitor.config import load_config  # noqa: E402
 from context_janitor.models import load_tools  # noqa: E402
 from context_janitor.providers import ProviderError  # noqa: E402
 from context_janitor.selection import select_resilient  # noqa: E402
@@ -37,8 +38,10 @@ def main() -> int:
         help="Fail if any evaluated provider falls below this measured agent-success delta.",
     )
     parser.add_argument("--format", choices=["table", "json"], default="table")
+    parser.add_argument("--config", help="Optional .janitor.yaml file for custom prompt aliases.")
     args = parser.parse_args()
 
+    config = load_config(explicit_path=args.config)
     tools = load_tools(_read_json(args.tools))
     cases = _read_cases(args.evals)
     agent_success = _read_agent_success(args.agent_success_file)
@@ -52,6 +55,7 @@ def main() -> int:
             args.timeout_ms,
             args.fallback,
             agent_success,
+            config.aliases,
         )
         for provider in args.providers
     ]
@@ -77,6 +81,7 @@ def _evaluate_provider(
     timeout_ms: int,
     fallback: str,
     agent_success: dict[str, Any],
+    prompt_aliases: dict[str, tuple[str, ...]],
 ) -> dict[str, Any]:
     if provider != "heuristic" and not _has_key(provider):
         return _skipped_row(provider, len(cases), "missing API key", agent_success)
@@ -98,6 +103,7 @@ def _evaluate_provider(
                 timeout_ms=timeout_ms,
                 fallback=fallback,
                 cache_enabled=False,
+                prompt_aliases=prompt_aliases,
             )
         except ProviderError as error:
             misses.append(_miss(case, expected, [], str(error)))
