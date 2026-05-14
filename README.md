@@ -649,6 +649,32 @@ To draft a real eval pack from agent logs:
 python scripts\prepare_evals.py --logs agent-logs.jsonl --success-field success --output production-evals.draft.json
 ```
 
+## Simulated Production Rehearsal
+
+Before you have real logs, generate a deterministic production-like dataset:
+
+```powershell
+python scripts\generate_simulated_data.py
+```
+
+This creates:
+
+- `examples\simulated_production_tools.json`: 100 OpenAI-style tools across realistic domains.
+- `examples\simulated_production_evals.json`: 100 labeled prompts.
+- `examples\simulated_agent_logs.jsonl`: 100 JSONL agent-log rows.
+
+Run selection accuracy:
+
+```powershell
+python scripts\evaluate.py --tools examples\simulated_production_tools.json --evals examples\simulated_production_evals.json --providers heuristic --limit 5 --min-accuracy 0.95
+```
+
+Run the full agent-success harness with the mock runner:
+
+```powershell
+python scripts\eval_agent.py --tools examples\simulated_production_tools.json --evals examples\simulated_production_evals.json --providers heuristic --limit 5 --min-janitor-success-rate 0.95 --min-distraction-delta 0.50 -- python examples\agent_runner_mock.py
+```
+
 ## Recipes
 
 - [LangChain / LangGraph](recipes/langchain-langgraph.md)

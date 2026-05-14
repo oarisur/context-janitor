@@ -1,0 +1,1062 @@
+[
+  {
+    "function": {
+      "description": "Search GitHub issues by repository, text, label, state, assignee, or milestone.",
+      "name": "github_search_issues",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for github_search_issues.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "engineering"
+  },
+  {
+    "function": {
+      "description": "Open a GitHub pull request with title, body, source branch, and target branch.",
+      "name": "github_create_pr",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for github_create_pr.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "engineering"
+  },
+  {
+    "function": {
+      "description": "Create a Linear issue with title, description, team, priority, and labels.",
+      "name": "linear_create_issue",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for linear_create_issue.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "project-management"
+  },
+  {
+    "function": {
+      "description": "Move a Jira ticket to another workflow state with an optional comment.",
+      "name": "jira_transition_ticket",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for jira_transition_ticket.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "project-management"
+  },
+  {
+    "function": {
+      "description": "Send a Slack message to a channel or user, optionally with markdown formatting.",
+      "name": "slack_send_message",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for slack_send_message.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "communication"
+  },
+  {
+    "function": {
+      "description": "Send an email with recipients, subject, body, cc, bcc, and attachments.",
+      "name": "gmail_send_email",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for gmail_send_email.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "communication"
+  },
+  {
+    "function": {
+      "description": "Create a calendar event with attendees, title, date, time, and location.",
+      "name": "calendar_create_event",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for calendar_create_event.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "calendar"
+  },
+  {
+    "function": {
+      "description": "Find open calendar slots across attendees and date ranges.",
+      "name": "calendar_find_availability",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for calendar_find_availability.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "calendar"
+  },
+  {
+    "function": {
+      "description": "Run a read-only SQL query against Postgres for revenue, users, jobs, or events.",
+      "name": "postgres_query",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for postgres_query.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "data"
+  },
+  {
+    "function": {
+      "description": "Run an analytical BigQuery SQL query for warehouse reports and dashboards.",
+      "name": "bigquery_run_query",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for bigquery_run_query.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "data"
+  },
+  {
+    "function": {
+      "description": "Create a Stripe Checkout payment link for a product, price, customer, or plan.",
+      "name": "stripe_create_checkout",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for stripe_create_checkout.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "payments"
+  },
+  {
+    "function": {
+      "description": "Refund a Stripe payment by charge, payment intent, amount, and reason.",
+      "name": "stripe_refund_payment",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for stripe_refund_payment.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "payments"
+  },
+  {
+    "function": {
+      "description": "Create or update a HubSpot contact with email, company, owner, and lifecycle stage.",
+      "name": "hubspot_create_contact",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for hubspot_create_contact.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "sales"
+  },
+  {
+    "function": {
+      "description": "Update a Salesforce opportunity amount, stage, close date, owner, or notes.",
+      "name": "salesforce_update_opportunity",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for salesforce_update_opportunity.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "sales"
+  },
+  {
+    "function": {
+      "description": "Search the public web for current news, pricing, documentation, or references.",
+      "name": "web_search",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for web_search.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "research"
+  },
+  {
+    "function": {
+      "description": "Extract text and tables from a PDF document for summarization or analysis.",
+      "name": "pdf_extract_text",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for pdf_extract_text.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "documents"
+  },
+  {
+    "function": {
+      "description": "Create a Notion page in a workspace, database, or team wiki.",
+      "name": "notion_create_page",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for notion_create_page.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "documents"
+  },
+  {
+    "function": {
+      "description": "Upload a file to Amazon S3 with bucket, key, content type, and metadata.",
+      "name": "s3_upload_file",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for s3_upload_file.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "storage"
+  },
+  {
+    "function": {
+      "description": "Create a Zendesk support ticket with requester, subject, priority, and tags.",
+      "name": "zendesk_create_ticket",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for zendesk_create_ticket.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "support"
+  },
+  {
+    "function": {
+      "description": "Query Datadog logs and metrics by service, time range, status, and tags.",
+      "name": "datadog_query_logs",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Input text or structured request for datadog_query_logs.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "function",
+    "x-domain": "observability"
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_00"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_01"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_02"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_03"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_04"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_05"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_06"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_07"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_08"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal legacy maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "legacy_internal_09"
+    },
+    "type": "function",
+    "x-domain": "legacy",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_00"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_01"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_02"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_03"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_04"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_05"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_06"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_07"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_08"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal admin maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "admin_internal_09"
+    },
+    "type": "function",
+    "x-domain": "admin",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_00"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_01"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_02"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_03"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_04"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_05"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_06"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_07"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_08"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal finance maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "finance_internal_09"
+    },
+    "type": "function",
+    "x-domain": "finance",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_00"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_01"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_02"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_03"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_04"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_05"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_06"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_07"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_08"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal warehouse maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "warehouse_internal_09"
+    },
+    "type": "function",
+    "x-domain": "warehouse",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_00"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_01"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_02"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_03"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_04"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_05"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_06"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_07"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_08"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal experiments maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "experiments_internal_09"
+    },
+    "type": "function",
+    "x-domain": "experiments",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_00"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_01"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_02"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_03"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_04"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_05"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_06"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_07"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_08"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal notifications maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "notifications_internal_09"
+    },
+    "type": "function",
+    "x-domain": "notifications",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_00"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_01"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_02"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_03"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_04"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_05"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_06"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_07"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_08"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal content maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "content_internal_09"
+    },
+    "type": "function",
+    "x-domain": "content",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_00"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_01"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_02"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_03"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_04"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_05"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_06"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_07"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_08"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  },
+  {
+    "function": {
+      "description": "Internal security maintenance helper for archived workflows, migration tasks, and low-level operator actions.",
+      "name": "security_internal_09"
+    },
+    "type": "function",
+    "x-domain": "security",
+    "x-simulated-distractor": true
+  }
+]

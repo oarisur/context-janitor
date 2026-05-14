@@ -1,0 +1,710 @@
+{
+  "cases": [
+    {
+      "expected_tools": [
+        "github_search_issues"
+      ],
+      "id": "sim-001",
+      "prompt": "Find open GitHub issues tagged billing and summarize the blockers."
+    },
+    {
+      "expected_tools": [
+        "github_search_issues"
+      ],
+      "id": "sim-002",
+      "prompt": "Search GitHub for flaky test issues assigned to the platform team."
+    },
+    {
+      "expected_tools": [
+        "github_search_issues"
+      ],
+      "id": "sim-003",
+      "prompt": "Look up closed GitHub issues about OAuth regressions from last week."
+    },
+    {
+      "expected_tools": [
+        "github_search_issues"
+      ],
+      "id": "sim-004",
+      "prompt": "Find GitHub issues mentioning database migration failures."
+    },
+    {
+      "expected_tools": [
+        "github_search_issues"
+      ],
+      "id": "sim-005",
+      "prompt": "Search the repository issues for customer-reported login errors."
+    },
+    {
+      "expected_tools": [
+        "github_create_pr"
+      ],
+      "id": "sim-006",
+      "prompt": "Create a pull request from release-notes into main."
+    },
+    {
+      "expected_tools": [
+        "github_create_pr"
+      ],
+      "id": "sim-007",
+      "prompt": "Open a PR for the hotfix branch and mention the incident ticket."
+    },
+    {
+      "expected_tools": [
+        "github_create_pr"
+      ],
+      "id": "sim-008",
+      "prompt": "Create a GitHub pull request for the docs cleanup branch."
+    },
+    {
+      "expected_tools": [
+        "github_create_pr"
+      ],
+      "id": "sim-009",
+      "prompt": "Open a pull request from feature/export-csv to develop."
+    },
+    {
+      "expected_tools": [
+        "github_create_pr"
+      ],
+      "id": "sim-010",
+      "prompt": "Create a draft PR for the refactor branch with a short summary."
+    },
+    {
+      "expected_tools": [
+        "linear_create_issue"
+      ],
+      "id": "sim-011",
+      "prompt": "Create a Linear issue for improving checkout error handling."
+    },
+    {
+      "expected_tools": [
+        "linear_create_issue"
+      ],
+      "id": "sim-012",
+      "prompt": "File a high priority Linear ticket for the broken onboarding email."
+    },
+    {
+      "expected_tools": [
+        "linear_create_issue"
+      ],
+      "id": "sim-013",
+      "prompt": "Create a Linear bug for mobile users seeing blank invoices."
+    },
+    {
+      "expected_tools": [
+        "linear_create_issue"
+      ],
+      "id": "sim-014",
+      "prompt": "Add a Linear issue for documenting the new API rate limits."
+    },
+    {
+      "expected_tools": [
+        "linear_create_issue"
+      ],
+      "id": "sim-015",
+      "prompt": "Create a Linear task for the support dashboard pagination bug."
+    },
+    {
+      "expected_tools": [
+        "jira_transition_ticket"
+      ],
+      "id": "sim-016",
+      "prompt": "Move Jira ticket OPS-142 to In Review with a deployment note."
+    },
+    {
+      "expected_tools": [
+        "jira_transition_ticket"
+      ],
+      "id": "sim-017",
+      "prompt": "Transition DEV-883 to Done and add the QA approval comment."
+    },
+    {
+      "expected_tools": [
+        "jira_transition_ticket"
+      ],
+      "id": "sim-018",
+      "prompt": "Put Jira issue SEC-19 back into Todo because the patch failed."
+    },
+    {
+      "expected_tools": [
+        "jira_transition_ticket"
+      ],
+      "id": "sim-019",
+      "prompt": "Move the billing Jira ticket to Blocked and explain the dependency."
+    },
+    {
+      "expected_tools": [
+        "jira_transition_ticket"
+      ],
+      "id": "sim-020",
+      "prompt": "Transition the release Jira task to Ready for QA."
+    },
+    {
+      "expected_tools": [
+        "slack_send_message"
+      ],
+      "id": "sim-021",
+      "prompt": "Send the revenue summary to the marketing Slack channel."
+    },
+    {
+      "expected_tools": [
+        "slack_send_message"
+      ],
+      "id": "sim-022",
+      "prompt": "Message the on-call channel that the database migration finished."
+    },
+    {
+      "expected_tools": [
+        "slack_send_message"
+      ],
+      "id": "sim-023",
+      "prompt": "Post a Slack update to support about the delayed invoice fix."
+    },
+    {
+      "expected_tools": [
+        "slack_send_message"
+      ],
+      "id": "sim-024",
+      "prompt": "Send a formatted Slack note to sales with the demo account links."
+    },
+    {
+      "expected_tools": [
+        "slack_send_message"
+      ],
+      "id": "sim-025",
+      "prompt": "Notify the engineering Slack channel that the release is ready."
+    },
+    {
+      "expected_tools": [
+        "gmail_send_email"
+      ],
+      "id": "sim-026",
+      "prompt": "Email the customer a short update about their escalation."
+    },
+    {
+      "expected_tools": [
+        "gmail_send_email"
+      ],
+      "id": "sim-027",
+      "prompt": "Send finance an email with the invoice reconciliation notes."
+    },
+    {
+      "expected_tools": [
+        "gmail_send_email"
+      ],
+      "id": "sim-028",
+      "prompt": "Email the hiring panel the interview schedule for tomorrow."
+    },
+    {
+      "expected_tools": [
+        "gmail_send_email"
+      ],
+      "id": "sim-029",
+      "prompt": "Send a follow-up email to the vendor about the signed contract."
+    },
+    {
+      "expected_tools": [
+        "gmail_send_email"
+      ],
+      "id": "sim-030",
+      "prompt": "Email the beta users with the new feature announcement."
+    },
+    {
+      "expected_tools": [
+        "calendar_create_event"
+      ],
+      "id": "sim-031",
+      "prompt": "Schedule a meeting with the support team tomorrow afternoon."
+    },
+    {
+      "expected_tools": [
+        "calendar_create_event"
+      ],
+      "id": "sim-032",
+      "prompt": "Create a calendar event for the release retrospective on Friday."
+    },
+    {
+      "expected_tools": [
+        "calendar_create_event"
+      ],
+      "id": "sim-033",
+      "prompt": "Set up a customer kickoff call with Alex and Priya next Tuesday."
+    },
+    {
+      "expected_tools": [
+        "calendar_create_event"
+      ],
+      "id": "sim-034",
+      "prompt": "Schedule the quarterly security review with the compliance team."
+    },
+    {
+      "expected_tools": [
+        "calendar_create_event"
+      ],
+      "id": "sim-035",
+      "prompt": "Create a calendar hold for the deployment window tonight."
+    },
+    {
+      "expected_tools": [
+        "calendar_find_availability"
+      ],
+      "id": "sim-036",
+      "prompt": "Find a free 30-minute slot for the product sync next week."
+    },
+    {
+      "expected_tools": [
+        "calendar_find_availability"
+      ],
+      "id": "sim-037",
+      "prompt": "Check when Sam and Morgan are both available tomorrow."
+    },
+    {
+      "expected_tools": [
+        "calendar_find_availability"
+      ],
+      "id": "sim-038",
+      "prompt": "Find availability for a customer call before Thursday."
+    },
+    {
+      "expected_tools": [
+        "calendar_find_availability"
+      ],
+      "id": "sim-039",
+      "prompt": "Look for an open hour on the leadership calendar this afternoon."
+    },
+    {
+      "expected_tools": [
+        "calendar_find_availability"
+      ],
+      "id": "sim-040",
+      "prompt": "Find a meeting slot for the data review with three attendees."
+    },
+    {
+      "expected_tools": [
+        "postgres_query"
+      ],
+      "id": "sim-041",
+      "prompt": "Run a Postgres query for yesterday's failed jobs."
+    },
+    {
+      "expected_tools": [
+        "postgres_query"
+      ],
+      "id": "sim-042",
+      "prompt": "Check the database for revenue by plan over the last seven days."
+    },
+    {
+      "expected_tools": [
+        "postgres_query"
+      ],
+      "id": "sim-043",
+      "prompt": "Query Postgres for users who churned after trial expiration."
+    },
+    {
+      "expected_tools": [
+        "postgres_query"
+      ],
+      "id": "sim-044",
+      "prompt": "Fetch the top five accounts by invoice volume from the database."
+    },
+    {
+      "expected_tools": [
+        "postgres_query"
+      ],
+      "id": "sim-045",
+      "prompt": "Run SQL to count API errors grouped by endpoint today."
+    },
+    {
+      "expected_tools": [
+        "bigquery_run_query"
+      ],
+      "id": "sim-046",
+      "prompt": "Run a BigQuery report for weekly active teams by region."
+    },
+    {
+      "expected_tools": [
+        "bigquery_run_query"
+      ],
+      "id": "sim-047",
+      "prompt": "Query the warehouse for conversion rates by acquisition channel."
+    },
+    {
+      "expected_tools": [
+        "bigquery_run_query"
+      ],
+      "id": "sim-048",
+      "prompt": "Use BigQuery to calculate retention for the March cohort."
+    },
+    {
+      "expected_tools": [
+        "bigquery_run_query"
+      ],
+      "id": "sim-049",
+      "prompt": "Run the analytics query for support ticket volume by product area."
+    },
+    {
+      "expected_tools": [
+        "bigquery_run_query"
+      ],
+      "id": "sim-050",
+      "prompt": "Pull BigQuery results for usage growth across enterprise accounts."
+    },
+    {
+      "expected_tools": [
+        "stripe_create_checkout"
+      ],
+      "id": "sim-051",
+      "prompt": "Create a Stripe checkout link for the annual plan."
+    },
+    {
+      "expected_tools": [
+        "stripe_create_checkout"
+      ],
+      "id": "sim-052",
+      "prompt": "Generate a payment link for the customer upgrade invoice."
+    },
+    {
+      "expected_tools": [
+        "stripe_create_checkout"
+      ],
+      "id": "sim-053",
+      "prompt": "Create a Stripe checkout session for three enterprise seats."
+    },
+    {
+      "expected_tools": [
+        "stripe_create_checkout"
+      ],
+      "id": "sim-054",
+      "prompt": "Make a checkout link for the discounted beta subscription."
+    },
+    {
+      "expected_tools": [
+        "stripe_create_checkout"
+      ],
+      "id": "sim-055",
+      "prompt": "Create a Stripe payment page for the onboarding package."
+    },
+    {
+      "expected_tools": [
+        "stripe_refund_payment"
+      ],
+      "id": "sim-056",
+      "prompt": "Refund the duplicate Stripe payment from yesterday."
+    },
+    {
+      "expected_tools": [
+        "stripe_refund_payment"
+      ],
+      "id": "sim-057",
+      "prompt": "Issue a partial refund for the failed setup charge."
+    },
+    {
+      "expected_tools": [
+        "stripe_refund_payment"
+      ],
+      "id": "sim-058",
+      "prompt": "Refund the customer's last card payment and mark the reason requested_by_customer."
+    },
+    {
+      "expected_tools": [
+        "stripe_refund_payment"
+      ],
+      "id": "sim-059",
+      "prompt": "Create a Stripe refund for the cancelled annual subscription."
+    },
+    {
+      "expected_tools": [
+        "stripe_refund_payment"
+      ],
+      "id": "sim-060",
+      "prompt": "Refund the overcharged invoice payment for Acme Corp."
+    },
+    {
+      "expected_tools": [
+        "hubspot_create_contact"
+      ],
+      "id": "sim-061",
+      "prompt": "Create a HubSpot contact for the new trial lead."
+    },
+    {
+      "expected_tools": [
+        "hubspot_create_contact"
+      ],
+      "id": "sim-062",
+      "prompt": "Add the webinar attendee to HubSpot with their company name."
+    },
+    {
+      "expected_tools": [
+        "hubspot_create_contact"
+      ],
+      "id": "sim-063",
+      "prompt": "Update the HubSpot contact owner for the enterprise prospect."
+    },
+    {
+      "expected_tools": [
+        "hubspot_create_contact"
+      ],
+      "id": "sim-064",
+      "prompt": "Create a contact record for the inbound demo request."
+    },
+    {
+      "expected_tools": [
+        "hubspot_create_contact"
+      ],
+      "id": "sim-065",
+      "prompt": "Add the partner lead to HubSpot and set lifecycle stage to MQL."
+    },
+    {
+      "expected_tools": [
+        "salesforce_update_opportunity"
+      ],
+      "id": "sim-066",
+      "prompt": "Update the Salesforce opportunity stage to Contract Sent."
+    },
+    {
+      "expected_tools": [
+        "salesforce_update_opportunity"
+      ],
+      "id": "sim-067",
+      "prompt": "Change the close date on the Acme opportunity in Salesforce."
+    },
+    {
+      "expected_tools": [
+        "salesforce_update_opportunity"
+      ],
+      "id": "sim-068",
+      "prompt": "Add a note to the Salesforce deal after the procurement call."
+    },
+    {
+      "expected_tools": [
+        "salesforce_update_opportunity"
+      ],
+      "id": "sim-069",
+      "prompt": "Update the opportunity amount for the expansion deal."
+    },
+    {
+      "expected_tools": [
+        "salesforce_update_opportunity"
+      ],
+      "id": "sim-070",
+      "prompt": "Move the Salesforce opportunity to Closed Won."
+    },
+    {
+      "expected_tools": [
+        "web_search"
+      ],
+      "id": "sim-071",
+      "prompt": "Search the web for current competitor pricing references."
+    },
+    {
+      "expected_tools": [
+        "web_search"
+      ],
+      "id": "sim-072",
+      "prompt": "Find recent public documentation about OAuth device flow limits."
+    },
+    {
+      "expected_tools": [
+        "web_search"
+      ],
+      "id": "sim-073",
+      "prompt": "Search online for examples of SOC 2 vendor questionnaires."
+    },
+    {
+      "expected_tools": [
+        "web_search"
+      ],
+      "id": "sim-074",
+      "prompt": "Look up current pricing for hosted vector databases."
+    },
+    {
+      "expected_tools": [
+        "web_search"
+      ],
+      "id": "sim-075",
+      "prompt": "Search the web for recent API reliability incidents from major providers."
+    },
+    {
+      "expected_tools": [
+        "pdf_extract_text"
+      ],
+      "id": "sim-076",
+      "prompt": "Extract text from the signed contract PDF and summarize renewal terms."
+    },
+    {
+      "expected_tools": [
+        "pdf_extract_text"
+      ],
+      "id": "sim-077",
+      "prompt": "Read the uploaded PDF invoice and pull out the due date."
+    },
+    {
+      "expected_tools": [
+        "pdf_extract_text"
+      ],
+      "id": "sim-078",
+      "prompt": "Extract the security questionnaire answers from the PDF."
+    },
+    {
+      "expected_tools": [
+        "pdf_extract_text"
+      ],
+      "id": "sim-079",
+      "prompt": "Pull the table of fees from the vendor agreement PDF."
+    },
+    {
+      "expected_tools": [
+        "pdf_extract_text"
+      ],
+      "id": "sim-080",
+      "prompt": "Extract text from the board deck PDF for a short summary."
+    },
+    {
+      "expected_tools": [
+        "notion_create_page"
+      ],
+      "id": "sim-081",
+      "prompt": "Create a Notion page for the incident postmortem."
+    },
+    {
+      "expected_tools": [
+        "notion_create_page"
+      ],
+      "id": "sim-082",
+      "prompt": "Add a Notion spec page for the import workflow."
+    },
+    {
+      "expected_tools": [
+        "notion_create_page"
+      ],
+      "id": "sim-083",
+      "prompt": "Create a Notion note with the customer discovery summary."
+    },
+    {
+      "expected_tools": [
+        "notion_create_page"
+      ],
+      "id": "sim-084",
+      "prompt": "Write a Notion page for the release checklist."
+    },
+    {
+      "expected_tools": [
+        "notion_create_page"
+      ],
+      "id": "sim-085",
+      "prompt": "Create a Notion page in the team wiki for API pagination."
+    },
+    {
+      "expected_tools": [
+        "s3_upload_file"
+      ],
+      "id": "sim-086",
+      "prompt": "Upload the generated CSV report to the analytics S3 bucket."
+    },
+    {
+      "expected_tools": [
+        "s3_upload_file"
+      ],
+      "id": "sim-087",
+      "prompt": "Put the exported invoices file into S3 under monthly-reports."
+    },
+    {
+      "expected_tools": [
+        "s3_upload_file"
+      ],
+      "id": "sim-088",
+      "prompt": "Upload the backup archive to the operations bucket."
+    },
+    {
+      "expected_tools": [
+        "s3_upload_file"
+      ],
+      "id": "sim-089",
+      "prompt": "Store the customer attachment in S3 with private access."
+    },
+    {
+      "expected_tools": [
+        "s3_upload_file"
+      ],
+      "id": "sim-090",
+      "prompt": "Upload the compliance evidence ZIP to the audit bucket."
+    },
+    {
+      "expected_tools": [
+        "zendesk_create_ticket"
+      ],
+      "id": "sim-091",
+      "prompt": "Create a Zendesk ticket for the customer's login problem."
+    },
+    {
+      "expected_tools": [
+        "zendesk_create_ticket"
+      ],
+      "id": "sim-092",
+      "prompt": "File a high priority Zendesk ticket for the payment failure."
+    },
+    {
+      "expected_tools": [
+        "zendesk_create_ticket"
+      ],
+      "id": "sim-093",
+      "prompt": "Create a support ticket about the missing invoice email."
+    },
+    {
+      "expected_tools": [
+        "zendesk_create_ticket"
+      ],
+      "id": "sim-094",
+      "prompt": "Open a Zendesk ticket for a workspace export request."
+    },
+    {
+      "expected_tools": [
+        "zendesk_create_ticket"
+      ],
+      "id": "sim-095",
+      "prompt": "Create a Zendesk case for the enterprise SSO setup question."
+    },
+    {
+      "expected_tools": [
+        "datadog_query_logs"
+      ],
+      "id": "sim-096",
+      "prompt": "Check Datadog logs for API 500 errors in the last hour."
+    },
+    {
+      "expected_tools": [
+        "datadog_query_logs"
+      ],
+      "id": "sim-097",
+      "prompt": "Query Datadog for latency spikes on the checkout service."
+    },
+    {
+      "expected_tools": [
+        "datadog_query_logs"
+      ],
+      "id": "sim-098",
+      "prompt": "Look up Datadog logs for failed login attempts this morning."
+    },
+    {
+      "expected_tools": [
+        "datadog_query_logs"
+      ],
+      "id": "sim-099",
+      "prompt": "Check service metrics in Datadog during the deployment window."
+    },
+    {
+      "expected_tools": [
+        "datadog_query_logs"
+      ],
+      "id": "sim-100",
+      "prompt": "Query Datadog for error rates grouped by region."
+    }
+  ],
+  "metadata": {
+    "cases": 100,
+    "note": "Synthetic production-like data for rehearsing eval and middleware flows.",
+    "source": "scripts/generate_simulated_data.py",
+    "tools": 100
+  }
+}
