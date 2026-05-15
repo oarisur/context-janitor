@@ -58,10 +58,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/context-janitor/context-janitor"
-Repository = "https://github.com/context-janitor/context-janitor"
-Issues = "https://github.com/context-janitor/context-janitor/issues"
-Documentation = "https://github.com/context-janitor/context-janitor#readme"
+Homepage = "https://github.com/oarisur/context-janitor"
+Repository = "https://github.com/oarisur/context-janitor"
+Issues = "https://github.com/oarisur/context-janitor/issues"
+Documentation = "https://github.com/oarisur/context-janitor#readme"
 
 [project.scripts]
 context-janitor = "context_janitor.cli:main"
