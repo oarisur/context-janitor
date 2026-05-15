@@ -32,4 +32,6 @@ Manual release tasks:
 - Review `docs/production-rollout.md`
 - Replace example eval data with real production eval data for app-specific gates
 - Render or update `assets/terminal-demo.svg` if CLI output changed
+- Remove stale `dist/` and `build/` artifacts before building a publishable package
+- Upload only the artifacts for the current version, not every file in `dist/`
 - Create a matching Git tag, such as `v1.0.0rc1`

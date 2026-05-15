@@ -174,6 +174,17 @@ def main() -> int:
         ),
         ("roi report", [sys.executable, "scripts/roi_reporter.py"]),
         ("build", [sys.executable, "-m", "build"]),
+        (
+            "twine check",
+            [
+                sys.executable,
+                "-m",
+                "twine",
+                "check",
+                str(ROOT / "dist" / f"context_janitor-{VERSION}.tar.gz"),
+                str(ROOT / "dist" / f"context_janitor-{VERSION}-py3-none-any.whl"),
+            ],
+        ),
     ]
 
     for name, command in checks:

@@ -45,7 +45,7 @@ Current output on the included 100-prompt synthetic benchmark and `examples/tool
 | Mode                  | Selection accuracy | Agent success | Median ms | p95 ms | Router cost/run | Tool payload/run | Compression | Notes                                                                                                                                      |
 +-----------------------+--------------------+---------------+-----------+--------+-----------------+------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 | No Janitor (baseline) | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.001060        | 0.0%        | all 8 tools sent for 100 prompts |
-| heuristic             | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.000260        | 75.4%       | ok |
+| heuristic             | 100.0%             | not measured  | 0         | 0      | $0.000000       | $0.000280        | 73.6%       | ok |
 +-----------------------+--------------------+---------------+-----------+--------+-----------------+------------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
@@ -768,6 +768,7 @@ python scripts\benchmark.py --providers heuristic
 Build distributable artifacts:
 
 ```powershell
+Remove-Item -Recurse -Force dist,build -ErrorAction SilentlyContinue
 python -m build
 ```
 
@@ -784,7 +785,7 @@ python scripts\release_check.py
 - Create a matching GitHub release tag, for example `v1.0.0rc1`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
-- Build the wheel and source distribution.
+- Clean stale build artifacts, then build the wheel and source distribution.
 - Render or update the terminal GIF.
 - Verify the README examples still match CLI output.
 

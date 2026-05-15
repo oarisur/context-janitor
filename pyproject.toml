@@ -54,6 +54,7 @@ dev = [
   "pytest",
   "pytest-asyncio",
   "ruff",
+  "twine",
   "mypy",
 ]
 
