@@ -232,6 +232,18 @@ class CliTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("middleware input must be a JSON object", result.stderr)
 
+    def test_middleware_rejects_non_list_messages(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "context_janitor.cli", "middleware", "--limit", "1"],
+            input=json.dumps({"messages": "not-a-list", "tools": []}),
+            capture_output=True,
+            env=_env(),
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("messages must be a list", result.stderr)
+
     def test_cli_keep_forces_required_tool(self):
         import tempfile
 
@@ -272,6 +284,85 @@ class CliTest(unittest.TestCase):
             )
 
         self.assertEqual(result.stdout.strip().splitlines(), ["log_error", "web_search"])
+
+    def test_auto_config_cannot_select_network_provider(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            (root / ".janitor.yaml").write_text(
+                "provider: openai\nmodel: fast-model\n",
+                encoding="utf-8",
+            )
+            tools_path = root / "tools.json"
+            tools_path.write_text(
+                json.dumps([{"name": "web_search", "description": "Search the public web."}]),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "prune",
+                    "--prompt",
+                    "Search the web",
+                    "--tools",
+                    str(tools_path),
+                ],
+                capture_output=True,
+                cwd=temp_dir,
+                env=_env(),
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("auto-discovered config", result.stderr)
+
+    def test_explicit_config_can_select_network_provider_with_fallback(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            config_path = root / ".janitor.yaml"
+            config_path.write_text(
+                "provider: openai\nmodel: fast-model\nlimit: 1\n",
+                encoding="utf-8",
+            )
+            tools_path = root / "tools.json"
+            tools_path.write_text(
+                json.dumps(
+                    [
+                        {"name": "web_search", "description": "Search the public web."},
+                        {"name": "calendar_create", "description": "Create events."},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "prune",
+                    "--prompt",
+                    "Search the web",
+                    "--tools",
+                    str(tools_path),
+                    "--config",
+                    str(config_path),
+                ],
+                check=True,
+                capture_output=True,
+                cwd=temp_dir,
+                env=_env(),
+                text=True,
+            )
+
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["metadata"]["fallback_used"])
 
     def test_lint_reports_catalog_warnings(self):
         import tempfile

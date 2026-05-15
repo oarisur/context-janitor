@@ -88,6 +88,14 @@ class McpToolProxyTest(unittest.TestCase):
 
         self.assertEqual(prune_tools_list_response(message, "anything", limit=1), message)
 
+    def test_prune_tools_list_response_preserves_malformed_tool_payload(self):
+        message = {"jsonrpc": "2.0", "id": 1, "result": {"tools": [{"description": "missing name"}]}}
+
+        pruned = prune_tools_list_response(message, "anything", limit=1)
+
+        self.assertEqual(pruned["result"]["tools"], [{"description": "missing name"}])
+        self.assertIn("warning", pruned["result"]["_janitor"])
+
     def test_script_reexports_package_proxy_function(self):
         proxy = _load_proxy()
 

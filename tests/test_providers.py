@@ -1,10 +1,11 @@
 import json
 import os
+import urllib.error
 import unittest
 from unittest.mock import patch
 
 from context_janitor.models import Tool
-from context_janitor.providers import ProviderError, select_with_provider
+from context_janitor.providers import MAX_PROVIDER_ERROR_BODY_CHARS, ProviderError, select_with_provider
 
 
 class _FakeResponse:
@@ -27,6 +28,9 @@ class _FakeTextResponse(_FakeResponse):
 
     def read(self):
         return self.text.encode("utf-8")
+
+    def close(self):
+        pass
 
 
 class ProviderTest(unittest.TestCase):
@@ -121,6 +125,25 @@ class ProviderTest(unittest.TestCase):
         ):
             with self.assertRaisesRegex(ProviderError, "invalid JSON"):
                 select_with_provider("openai", "Search GitHub issues", _tools(), 1, "gpt-test")
+
+    def test_provider_truncates_large_http_error_body(self):
+        error = urllib.error.HTTPError(
+            url="https://example.test",
+            code=500,
+            msg="Server Error",
+            hdrs=None,
+            fp=_FakeTextResponse("x" * (MAX_PROVIDER_ERROR_BODY_CHARS + 100)),
+        )
+
+        with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}), patch(
+            "urllib.request.urlopen",
+            side_effect=error,
+        ):
+            with self.assertRaises(ProviderError) as raised:
+                select_with_provider("openai", "Search GitHub issues", _tools(), 1, "gpt-test")
+
+        self.assertIn("[truncated]", str(raised.exception))
+        self.assertLess(len(str(raised.exception)), MAX_PROVIDER_ERROR_BODY_CHARS + 200)
 
 
 def _tools():

@@ -12,6 +12,9 @@ from typing import Any
 from .models import Tool
 from .ranker import PromptAliases, tokens
 
+MAX_CACHE_BYTES = 5 * 1024 * 1024
+MAX_CACHED_PROMPT_CHARS = 20_000
+
 
 @dataclass(frozen=True)
 class CacheEntry:
@@ -104,7 +107,7 @@ def store_selection(
     catalog_hash = _catalog_hash(tools)
     alias_hash = _aliases_hash(prompt_aliases)
     payload[_entry_key(prompt, catalog_hash, provider, model, limit, alias_hash)] = {
-        "prompt": prompt,
+        "prompt": prompt[:MAX_CACHED_PROMPT_CHARS],
         "prompt_tokens": tokens(prompt),
         "catalog_hash": catalog_hash,
         "alias_hash": alias_hash,
@@ -122,6 +125,8 @@ def _read_cache(path: Path) -> dict[str, Any]:
     try:
         if not path.exists():
             return {}
+        if path.stat().st_size > MAX_CACHE_BYTES:
+            return {}
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {}
@@ -129,6 +134,7 @@ def _read_cache(path: Path) -> dict[str, Any]:
 
 
 def _write_cache(path: Path, payload: dict[str, Any]) -> None:
+    payload = _trim_payload_to_size(payload)
     encoded = json.dumps(payload, indent=2, sort_keys=True)
     temp_name = ""
     try:
@@ -151,6 +157,20 @@ def _write_cache(path: Path, payload: dict[str, Any]) -> None:
                 Path(temp_name).unlink(missing_ok=True)
             except OSError:
                 pass
+
+
+def _trim_payload_to_size(payload: dict[str, Any]) -> dict[str, Any]:
+    trimmed = dict(payload)
+    while trimmed and len(json.dumps(trimmed, sort_keys=True).encode("utf-8")) > MAX_CACHE_BYTES:
+        oldest_key = min(trimmed, key=lambda key: _created_at(trimmed[key]))
+        trimmed.pop(oldest_key, None)
+    return trimmed
+
+
+def _created_at(entry: Any) -> int:
+    if isinstance(entry, dict) and isinstance(entry.get("created_at"), int):
+        return entry["created_at"]
+    return 0
 
 
 def _catalog_hash(tools: list[Tool]) -> str:

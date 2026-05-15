@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from context_janitor.cache import get_cached_selection, store_selection
+from context_janitor.cache import MAX_CACHE_BYTES, cache_info, get_cached_selection, store_selection
 from context_janitor.models import Tool
 
 
@@ -91,6 +91,28 @@ class CacheTest(unittest.TestCase):
 
         self.assertIsNone(entry_without_aliases)
         self.assertIsNotNone(entry_with_aliases)
+
+    def test_oversized_cache_file_is_ignored(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / "cache.json"
+            cache_path.write_text("{" + (" " * MAX_CACHE_BYTES) + "}", encoding="utf-8")
+
+            info = cache_info(cache_path)
+
+        self.assertTrue(info["exists"])
+        self.assertEqual(info["entries"], 0)
+
+    def test_cached_prompt_preview_is_truncated(self):
+        tools = [Tool("web_search", "Search the public web.")]
+        prompt = "x" * 25_000
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / "cache.json"
+            store_selection(prompt, tools, tools, "heuristic", None, 1, cache_path)
+
+            payload = json.loads(cache_path.read_text(encoding="utf-8"))
+            cached_prompt = next(iter(payload.values()))["prompt"]
+
+        self.assertEqual(len(cached_prompt), 20_000)
 
 
 if __name__ == "__main__":

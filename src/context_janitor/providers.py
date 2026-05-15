@@ -11,6 +11,8 @@ from typing import Any
 from .models import Tool
 from .ranker import PromptAliases, select_tools
 
+MAX_PROVIDER_ERROR_BODY_CHARS = 4_000
+
 
 class ProviderError(RuntimeError):
     pass
@@ -162,7 +164,7 @@ def _post_json(
     except json.JSONDecodeError as error:
         raise ProviderError("Provider returned invalid JSON.") from error
     except urllib.error.HTTPError as error:
-        message = error.read().decode("utf-8", errors="replace")
+        message = _truncate(error.read().decode("utf-8", errors="replace"), MAX_PROVIDER_ERROR_BODY_CHARS)
         raise ProviderError(f"Provider request failed with HTTP {error.code}: {message}") from error
     except urllib.error.URLError as error:
         raise ProviderError(f"Provider request failed: {error.reason}") from error
@@ -211,6 +213,12 @@ def _extract_names(text: str) -> list[str]:
     if isinstance(payload, list):
         return [str(name) for name in payload]
     return []
+
+
+def _truncate(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    return f"{text[:limit]}... [truncated]"
 
 
 def _tools_by_names(names: list[str], tools: list[Tool], limit: int) -> list[Tool]:

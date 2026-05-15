@@ -10,12 +10,15 @@ from pathlib import Path
 from typing import Any
 
 from .cache import cache_info, clear_cache, default_cache_path
-from .config import JanitorConfig, load_config, merge_config
+from .config import JanitorConfig, find_config, load_config, merge_config
 from .models import load_tools, raw_tools
 from .mcp_proxy import run_proxy
 from .providers import ProviderError
 from .ranker import explain_tools
 from .selection import SelectionResult, select_resilient
+
+MAX_JSON_INPUT_BYTES = 10 * 1024 * 1024
+MAX_STDIN_CHARS = 10 * 1024 * 1024
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -96,9 +99,8 @@ def main(argv: list[str] | None = None) -> int:
 def _prune(args: argparse.Namespace) -> int:
     config = _resolve_config(args)
     logger = _setup_logging(config.log_level)
-    prompt = args.prompt if args.prompt is not None else sys.stdin.read()
-    with open(args.tools, encoding="utf-8") as handle:
-        tools = load_tools(json.load(handle))
+    prompt = args.prompt if args.prompt is not None else _read_stdin_text()
+    tools = load_tools(_read_json_file(args.tools))
 
     result = select_resilient(
         config.provider,
@@ -120,8 +122,7 @@ def _prune(args: argparse.Namespace) -> int:
 
 
 def _lint(args: argparse.Namespace) -> int:
-    with open(args.tools, encoding="utf-8") as handle:
-        tools = load_tools(json.load(handle))
+    tools = load_tools(_read_json_file(args.tools))
 
     warnings = _lint_warnings(tools)
     payload = {
@@ -175,7 +176,7 @@ def _cache_info(args: argparse.Namespace) -> int:
 def _middleware(args: argparse.Namespace) -> int:
     config = _resolve_config(args)
     logger = _setup_logging(config.log_level)
-    payload = json.load(sys.stdin)
+    payload = _read_stdin_json()
     if not isinstance(payload, dict):
         raise ValueError("middleware input must be a JSON object with optional 'messages' and 'tools' fields.")
     tools = load_tools(payload.get("tools", []))
@@ -325,7 +326,14 @@ def _add_common_options(parser: argparse.ArgumentParser) -> None:
 
 
 def _resolve_config(args: argparse.Namespace) -> JanitorConfig:
-    config = load_config(explicit_path=args.config)
+    explicit_config = getattr(args, "config", None)
+    auto_config = None if explicit_config else find_config(Path.cwd())
+    config = load_config(explicit_path=explicit_config)
+    if auto_config and getattr(args, "provider", None) is None and config.provider != "heuristic":
+        raise ValueError(
+            f"auto-discovered config at {auto_config} cannot select network provider "
+            f"'{config.provider}'. Pass --config or --provider explicitly if you trust this project."
+        )
     overrides = {
         "provider": getattr(args, "provider", None),
         "model": getattr(args, "model", None),
@@ -339,6 +347,32 @@ def _resolve_config(args: argparse.Namespace) -> JanitorConfig:
         "keep": _parse_keep(getattr(args, "keep", None)),
     }
     return merge_config(config, overrides)
+
+
+def _read_json_file(path_value: str) -> Any:
+    path = Path(path_value)
+    size = path.stat().st_size
+    if size > MAX_JSON_INPUT_BYTES:
+        raise ValueError(
+            f"{path} is too large to read as JSON "
+            f"({size} bytes; limit is {MAX_JSON_INPUT_BYTES} bytes)."
+        )
+    with path.open(encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _read_stdin_json() -> Any:
+    text = sys.stdin.read(MAX_STDIN_CHARS + 1)
+    if len(text) > MAX_STDIN_CHARS:
+        raise ValueError(f"stdin JSON is too large; limit is {MAX_STDIN_CHARS} characters.")
+    return json.loads(text)
+
+
+def _read_stdin_text() -> str:
+    text = sys.stdin.read(MAX_STDIN_CHARS + 1)
+    if len(text) > MAX_STDIN_CHARS:
+        raise ValueError(f"stdin prompt is too large; limit is {MAX_STDIN_CHARS} characters.")
+    return text
 
 
 def _setup_logging(level: str) -> logging.Logger:
@@ -493,8 +527,15 @@ def _parse_keep(value: str | None) -> tuple[str, ...] | None:
 
 
 def _prompt_from_messages(messages: list[dict[str, Any]]) -> str:
+    if messages is None:
+        return ""
+    if not isinstance(messages, list):
+        raise ValueError("messages must be a list when provided.")
+
     parts = []
-    for message in messages:
+    for index, message in enumerate(messages):
+        if not isinstance(message, dict):
+            raise ValueError(f"message at index {index} must be an object.")
         role = message.get("role", "unknown")
         content = message.get("content", "")
         if isinstance(content, str):

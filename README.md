@@ -325,6 +325,12 @@ mapping shown above. It is not a full YAML implementation.
 
 CLI flags override config values.
 
+For safety in untrusted repositories, an auto-discovered `.janitor.yaml` cannot silently switch the
+selector from `heuristic` to a network provider. If a discovered config sets `provider: openai`,
+`provider: anthropic`, or `provider: gemini`, pass `--config path\to\.janitor.yaml` or
+`--provider ...` explicitly to confirm that you trust the project and intend to send prompts/tool
+metadata to that provider.
+
 | Key | Default | Description |
 | --- | --- | --- |
 | `provider` | `heuristic` | Selection backend: `heuristic`, `openai`, `anthropic`, or `gemini` |
@@ -376,6 +382,10 @@ The cache stores selections by prompt, provider, model, limit, and catalog hash.
 highly similar prompts. If the cache cannot be read or written, Janitor ignores the cache and keeps
 running. Cache updates are written through a temporary file and atomically replaced, so interrupted
 writes should not leave partial JSON behind.
+
+Privacy note: `--cache` stores prompt previews and prompt tokens in a local plaintext file. Keep it
+off for sensitive prompts unless local plaintext storage is acceptable for your environment. Janitor
+ignores oversized cache files and trims old entries so the cache cannot grow without bound.
 
 Clear the local cache while iterating on prompts or tool descriptions:
 

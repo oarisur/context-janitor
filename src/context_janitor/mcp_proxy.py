@@ -8,6 +8,7 @@ from argparse import Namespace
 from typing import Any, TextIO
 
 from .models import load_tools, raw_tools
+from .providers import ProviderError
 from .ranker import PromptAliases
 from .selection import select_resilient
 
@@ -49,30 +50,38 @@ def run_proxy(
                         pending_tools_list.add(message.get("id"))
                 server_stdin.write(line)
                 server_stdin.flush()
+        except (BrokenPipeError, OSError) as error:
+            _write_proxy_error(stderr, f"client->server pipe closed: {error}")
         finally:
-            server_stdin.close()
+            try:
+                server_stdin.close()
+            except OSError:
+                pass
 
     def server_to_client() -> None:
-        for line in server_stdout:
-            message = _parse_json_line(line)
-            if isinstance(message, dict):
-                with lock:
-                    should_prune = message.get("id") in pending_tools_list
-                    pending_tools_list.discard(message.get("id"))
-                if should_prune:
-                    message = prune_tools_list_response(
-                        message,
-                        prompt=prompt,
-                        limit=args.limit,
-                        provider=args.provider,
-                        model=args.model,
-                        fallback=args.fallback,
-                        timeout_ms=args.timeout_ms,
-                        prompt_aliases=getattr(args, "aliases", None),
-                    )
-                    line = json.dumps(message, separators=(",", ":")) + "\n"
-            stdout.write(line)
-            stdout.flush()
+        try:
+            for line in server_stdout:
+                message = _parse_json_line(line)
+                if isinstance(message, dict):
+                    with lock:
+                        should_prune = message.get("id") in pending_tools_list
+                        pending_tools_list.discard(message.get("id"))
+                    if should_prune:
+                        message = prune_tools_list_response(
+                            message,
+                            prompt=prompt,
+                            limit=args.limit,
+                            provider=args.provider,
+                            model=args.model,
+                            fallback=args.fallback,
+                            timeout_ms=args.timeout_ms,
+                            prompt_aliases=getattr(args, "aliases", None),
+                        )
+                        line = json.dumps(message, separators=(",", ":")) + "\n"
+                stdout.write(line)
+                stdout.flush()
+        except (BrokenPipeError, OSError) as error:
+            _write_proxy_error(stderr, f"server->client pipe closed: {error}")
 
     threads = [
         threading.Thread(target=client_to_server, daemon=True),
@@ -99,17 +108,29 @@ def prune_tools_list_response(
     if not isinstance(result, dict) or not isinstance(result.get("tools"), list):
         return message
 
-    tools = load_tools(result["tools"])
-    selected = select_resilient(
-        provider=provider,
-        prompt=prompt,
-        tools=tools,
-        limit=limit,
-        model=model,
-        fallback=fallback,
-        timeout_ms=timeout_ms,
-        prompt_aliases=prompt_aliases,
-    )
+    try:
+        tools = load_tools(result["tools"])
+        selected = select_resilient(
+            provider=provider,
+            prompt=prompt,
+            tools=tools,
+            limit=limit,
+            model=model,
+            fallback=fallback,
+            timeout_ms=timeout_ms,
+            prompt_aliases=prompt_aliases,
+        )
+    except (ValueError, ProviderError, OSError, RuntimeError) as error:
+        return {
+            **message,
+            "result": {
+                **result,
+                "_janitor": {
+                    "warning": f"could not prune tools/list response: {error}",
+                    "original_tools": len(result["tools"]),
+                },
+            },
+        }
     return {
         **message,
         "result": {
@@ -130,3 +151,10 @@ def _parse_json_line(line: str) -> Any:
         return json.loads(line)
     except json.JSONDecodeError:
         return None
+
+
+def _write_proxy_error(stderr: TextIO, message: str) -> None:
+    try:
+        print(f"[Janitor] proxy warning: {message}", file=stderr)
+    except OSError:
+        pass
