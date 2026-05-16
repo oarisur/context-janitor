@@ -35,6 +35,6 @@ Manual release tasks:
 - Render or update `assets/heuristic-flow.svg` if the heuristic flow changes
 - Remove stale `dist/` and `build/` artifacts before building a publishable package
 - Upload only the artifacts for the current version, not every file in `dist/`
-- Create a matching Git tag, such as `v1.0.0rc2`
+- Create a matching Git tag, such as `v1.0.0rc3`
 - For Trusted Publishing, configure PyPI to trust `.github/workflows/publish.yml` with the
   `pypi` GitHub environment, then publish from a GitHub Release.

@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +38,11 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         choices=["json", "names", "raw"],
         help="Output format. 'raw' returns original tool objects.",
+    )
+    prune.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run selection without reading or writing the local cache.",
     )
     prune.set_defaults(func=_prune)
 
@@ -99,6 +105,9 @@ def main(argv: list[str] | None = None) -> int:
 def _prune(args: argparse.Namespace) -> int:
     config = _resolve_config(args)
     logger = _setup_logging(config.log_level)
+    if args.dry_run and config.cache:
+        config = replace(config, cache=False)
+        logger.warning("event=dry_run cache=false")
     prompt = args.prompt if args.prompt is not None else _read_stdin_text()
     tools = load_tools(_read_json_file(args.tools))
 

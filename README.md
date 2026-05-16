@@ -1,8 +1,8 @@
 # Context Janitor
 
-**100.0% tool-selection accuracy on the bundled synthetic benchmark at 0 ms median latency, with zero router cost.**
+**Prune oversized LLM tool catalogs before they reach your agent, with local fallback and zero router cost by default.**
 
-![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc2/assets/terminal-demo.svg)
+![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc3/assets/terminal-demo.svg)
 
 Context Janitor is a dependency-free CLI and Python library for pruning oversized LLM tool
 catalogs. Give it a user prompt and a JSON list of tools, and it returns only the tools the agent
@@ -59,10 +59,10 @@ Benchmark notes:
 - The included benchmark is a small synthetic sanity check. Run it against your own catalog before
   making production claims.
 
-The repository also includes `examples/messy_production_evals.jsonl`, a 100-case prompt pack with
+The stronger release gate is `examples/messy_production_evals.jsonl`, a 100-case prompt pack with
 informal, ambiguous workplace phrasing, plus `examples/messy_aliases.janitor.yaml` for team slang.
-The release gate requires the local heuristic to keep the expected tool for every messy case
-against the simulated production catalog when that alias config is provided.
+The local heuristic must keep the expected tool for every messy case against the simulated
+production catalog when that alias config is provided.
 
 To display measured agent success rates:
 
@@ -284,7 +284,7 @@ The local selector is not just a keyword set. It is a compact TF-IDF-style ranke
 - Weighs rare terms more heavily with inverse document frequency
 - Adds a small bonus for longer substring matches
 
-![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc2/assets/heuristic-flow.svg)
+![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc3/assets/heuristic-flow.svg)
 
 Distinctive terms like `stripe`, `github`, `postgres`, or `pdf` usually beat generic words like
 `create`, `get`, or `send`.
@@ -375,9 +375,10 @@ highly similar prompts. If the cache cannot be read or written, Janitor ignores 
 running. Cache updates are written through a temporary file and atomically replaced, so interrupted
 writes should not leave partial JSON behind.
 
-Privacy note: `--cache` stores prompt previews and prompt tokens in a local plaintext file. Keep it
-off for sensitive prompts unless local plaintext storage is acceptable for your environment. Janitor
-ignores oversized cache files and trims old entries so the cache cannot grow without bound.
+Privacy note: `--cache` stores prompt previews and prompt tokens in a local plaintext file. The
+cache is not encrypted or obfuscated at rest. Keep it off for sensitive prompts unless local
+plaintext storage is acceptable for your environment. Janitor ignores oversized cache files and
+trims old entries so the cache cannot grow without bound.
 
 Clear the local cache while iterating on prompts or tool descriptions:
 
@@ -415,14 +416,19 @@ For `--format names` or `--format raw`, explanations are printed to stderr.
 
 ## Dry Run Mode
 
-Use `--dry-run` with `middleware` to audition Janitor without changing the request payload:
+Use `--dry-run` to audition Janitor without changing the middleware request payload or touching the
+local prune cache:
+
+```powershell
+janitor prune --cache --dry-run --prompt "Search GitHub issues" --tools examples\tools.json --limit 2
+```
 
 ```powershell
 Get-Content request.json | janitor middleware --limit 5 --dry-run --log-level INFO
 ```
 
-The original JSON is written back to stdout. Janitor logs what it would have kept and pruned to
-stderr.
+For `middleware`, the original JSON is written back to stdout. Janitor logs what it would have kept
+and pruned to stderr.
 
 ## CLI Reference
 
@@ -450,6 +456,7 @@ Options:
 | `--price-per-million-tokens N` | Cost estimate price |
 | `--keep a,b` | Required tools to keep |
 | `--explain` | Include or print ranking explanations |
+| `--dry-run` | Run selection without reading or writing the local cache |
 | `--format json` | Default structured output |
 | `--format names` | Print selected tool names |
 | `--format raw` | Print original selected tool objects |
@@ -463,7 +470,8 @@ Read a request payload from stdin and prune its `tools` field.
 janitor middleware [options] < request.json
 ```
 
-Most options match `prune`. `middleware` also supports `--dry-run`.
+Most options match `prune`. `middleware --dry-run` logs the pruning decision without modifying the
+request payload.
 
 ### `janitor mcp-proxy`
 
@@ -774,7 +782,7 @@ python scripts\release_check.py
 
 - Confirm the release version in [pyproject.toml](pyproject.toml).
 - Run [Release Checklist](docs/release-checklist.md).
-- Create a matching GitHub release tag, for example `v1.0.0rc2`.
+- Create a matching GitHub release tag, for example `v1.0.0rc3`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
 - Clean stale build artifacts, then build the wheel and source distribution.
@@ -783,7 +791,7 @@ python scripts\release_check.py
 
 ## Project Status
 
-Context Janitor is at `v1.0.0rc2`: the CLI, config shape, heuristic selector, fallback behavior,
+Context Janitor is at `v1.0.0rc3`: the CLI, config shape, heuristic selector, fallback behavior,
 cache path, MCP proxy, eval tooling, and packaging flow are release-candidate ready. Before the
 final `v1.0.0` release, the remaining validation target is real-world testing against external tool
 catalogs and at least one real-log eval pack.

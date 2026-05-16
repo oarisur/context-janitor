@@ -220,6 +220,52 @@ class CliTest(unittest.TestCase):
         self.assertEqual(len(payload["tools"]), 2)
         self.assertIn("event=dry_run", result.stderr)
 
+    def test_prune_dry_run_does_not_write_cache(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            tools_path = root / "tools.json"
+            cache_path = root / ".janitor_cache" / "cache.json"
+            tools_path.write_text(
+                json.dumps(
+                    [
+                        {"name": "calendar_create", "description": "Create calendar events."},
+                        {"name": "web_search", "description": "Search the web."},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            env = _env()
+            env["HOME"] = temp_dir
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "context_janitor.cli",
+                    "prune",
+                    "--prompt",
+                    "Create a calendar event",
+                    "--tools",
+                    str(tools_path),
+                    "--limit",
+                    "1",
+                    "--cache",
+                    "--dry-run",
+                ],
+                check=True,
+                capture_output=True,
+                env=env,
+                text=True,
+            )
+
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["selected"][0]["name"], "calendar_create")
+        self.assertIn("event=dry_run cache=false", result.stderr)
+        self.assertFalse(cache_path.exists())
+
     def test_middleware_rejects_non_object_json(self):
         result = subprocess.run(
             [sys.executable, "-m", "context_janitor.cli", "middleware", "--limit", "1"],
