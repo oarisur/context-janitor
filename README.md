@@ -793,5 +793,5 @@ python scripts\release_check.py
 
 Context Janitor is at `v1.0.0rc1`: the CLI, config shape, heuristic selector, fallback behavior,
 cache path, MCP proxy, eval tooling, and packaging flow are release-candidate ready. Before the
-final `v1.0.0` release, validate it against your own tool catalog and at least one real-log eval
-pack.
+final `v1.0.0` release, the remaining validation target is real-world testing against external tool
+catalogs and at least one real-log eval pack.
