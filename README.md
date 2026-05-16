@@ -2,13 +2,14 @@
 
 **Prune oversized LLM tool catalogs before they reach your agent, with local fallback and zero router cost by default.**
 
-![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc3/assets/terminal-demo.svg)
+![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc4/assets/terminal-demo.svg)
 
 Context Janitor is a dependency-free CLI and Python library for pruning oversized LLM tool
 catalogs. Give it a user prompt and a JSON list of tools, and it returns only the tools the agent
 is likely to need.
 
-It is built for agent systems where sending every available tool is expensive, slow, and noisy.
+It is built for agent systems where sending every available tool can become expensive, slow, and
+noisy.
 If an API-backed router fails, times out, or is missing credentials, Context Janitor can fall back
 to a local heuristic so the pipeline keeps moving.
 
@@ -18,12 +19,31 @@ mcp-proxy`.
 
 ## Why It Exists
 
-Large tool catalogs make agents worse in two ways:
+Large tool catalogs can make agents worse in two ways:
 
 - They inflate every request with thousands of extra prompt tokens.
-- They increase the chance that the model picks a plausible but wrong tool.
+- They can increase the chance that the model picks a plausible but wrong tool.
 
 Context Janitor keeps the tool surface small before the main model sees it.
+
+## When To Use This
+
+Use Context Janitor when your agent has dozens of tools, tool schema tokens are inflating requests,
+or the model is choosing from too many similar tools. It is most useful when you want a small,
+inspectable pruning layer before a larger model call, middleware request, or MCP `tools/list`
+response.
+
+## When Not To Use This
+
+You may not need Janitor for tiny tool catalogs, one-off scripts, or workflows where every tool must
+always be visible to the model. If missing a tool would be risky, build an eval pack from your own
+agent logs before using pruning in production.
+
+## How It Fits With Evals
+
+Context Janitor reduces the tool-selection surface before inference. It does not evaluate argument
+correctness or replace observability tools. Pair it with agent eval tools when validating production
+tool-calling behavior.
 
 | Setup | Tools sent | Tool overhead | Expected effect |
 | --- | ---: | ---: | --- |
@@ -59,10 +79,10 @@ Benchmark notes:
 - The included benchmark is a small synthetic sanity check. Run it against your own catalog before
   making production claims.
 
-The stronger release gate is `examples/messy_production_evals.jsonl`, a 100-case prompt pack with
-informal, ambiguous workplace phrasing, plus `examples/messy_aliases.janitor.yaml` for team slang.
-The local heuristic must keep the expected tool for every messy case against the simulated
-production catalog when that alias config is provided.
+A more realistic release gate is `examples/messy_production_evals.jsonl`, a 100-case prompt pack
+with informal, ambiguous workplace phrasing, plus `examples/messy_aliases.janitor.yaml` for team
+slang. The release gate requires the local heuristic to keep the expected tool for every messy case
+against the simulated production catalog when that alias config is provided.
 
 To display measured agent success rates:
 
@@ -284,7 +304,7 @@ The local selector is not just a keyword set. It is a compact TF-IDF-style ranke
 - Weighs rare terms more heavily with inverse document frequency
 - Adds a small bonus for longer substring matches
 
-![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc3/assets/heuristic-flow.svg)
+![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc4/assets/heuristic-flow.svg)
 
 Distinctive terms like `stripe`, `github`, `postgres`, or `pdf` usually beat generic words like
 `create`, `get`, or `send`.
@@ -782,7 +802,7 @@ python scripts\release_check.py
 
 - Confirm the release version in [pyproject.toml](pyproject.toml).
 - Run [Release Checklist](docs/release-checklist.md).
-- Create a matching GitHub release tag, for example `v1.0.0rc3`.
+- Create a matching GitHub release tag, for example `v1.0.0rc4`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
 - Clean stale build artifacts, then build the wheel and source distribution.
@@ -791,7 +811,7 @@ python scripts\release_check.py
 
 ## Project Status
 
-Context Janitor is at `v1.0.0rc3`: the CLI, config shape, heuristic selector, fallback behavior,
-cache path, MCP proxy, eval tooling, and packaging flow are release-candidate ready. Before the
-final `v1.0.0` release, the remaining validation target is real-world testing against external tool
-catalogs and at least one real-log eval pack.
+Context Janitor is at `v1.0.0rc4`: the CLI, config shape, heuristic selector, fallback behavior,
+cache path, MCP proxy, eval tooling, and packaging flow are ready for final release-candidate
+validation. Before the final `v1.0.0` release, the remaining validation target is real-world testing
+against external tool catalogs and at least one real-log eval pack.

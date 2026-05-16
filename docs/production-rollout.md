@@ -1,11 +1,11 @@
 # Production Rollout
 
-Use this checklist when moving Context Janitor from pilot traffic to production traffic.
+Use this checklist when evaluating Context Janitor for pilot or production traffic.
 
 ## 1. Build A Real Eval Pack
 
-Start from agent logs, not synthetic prompts. Aim for 50-100 representative cases before relying on
-the results.
+Start from agent logs, not synthetic prompts. Aim for 50-100 representative cases before treating
+the results as a release or rollout signal.
 
 Create a first draft from JSON or JSONL logs:
 
@@ -29,7 +29,7 @@ Each case should include:
 
 - `id`: stable identifier for triage
 - `prompt`: the user or agent task prompt
-- `expected_tool` or `expected_tools`: tools that must survive pruning
+- `expected_tool` or `expected_tools`: tools that should survive pruning for this task
 - optional notes in your own tracking system for expected outcome and grading rationale
 
 Example:
@@ -82,9 +82,9 @@ python scripts\eval_agent.py `
   -- python run_agent_eval.py
 ```
 
-For early production, require `Distraction Delta >= 0`. That means Janitor must not reduce task
-success versus the full catalog. Raise the threshold only after you have enough cases to trust the
-measurement.
+For early production, a useful starting gate is `Distraction Delta >= 0`. That means the measured
+Janitor path should not reduce task success versus the full catalog on your eval pack. Raise the
+threshold only after you have enough cases to trust the measurement.
 
 ## 4. Lint The Catalog
 
@@ -108,7 +108,7 @@ janitor clear-cache
 
 Recommended rollout:
 
-- dry run in logs only
+- dry run in logs only with `janitor prune --dry-run` or `janitor middleware --dry-run`
 - small internal traffic slice
 - limited production slice with fallback enabled
 - broader production traffic after evals and logs agree
