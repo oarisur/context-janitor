@@ -2,7 +2,7 @@
 
 **100.0% tool-selection accuracy on the bundled synthetic benchmark at 0 ms median latency, with zero router cost.**
 
-![Context Janitor terminal demo](assets/terminal-demo.svg)
+![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc2/assets/terminal-demo.svg)
 
 Context Janitor is a dependency-free CLI and Python library for pruning oversized LLM tool
 catalogs. Give it a user prompt and a JSON list of tools, and it returns only the tools the agent
@@ -284,15 +284,7 @@ The local selector is not just a keyword set. It is a compact TF-IDF-style ranke
 - Weighs rare terms more heavily with inverse document frequency
 - Adds a small bonus for longer substring matches
 
-```mermaid
-flowchart LR
-  A["User prompt"] --> B["Tokenize and expand aliases"]
-  C["Tool catalog"] --> D["Tokenize names and descriptions"]
-  B --> E["Score prompt terms against each tool"]
-  D --> E
-  E --> F["Boost rare, specific matches"]
-  F --> G["Return top N tools"]
-```
+![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc2/assets/heuristic-flow.svg)
 
 Distinctive terms like `stripe`, `github`, `postgres`, or `pdf` usually beat generic words like
 `create`, `get`, or `send`.
@@ -782,7 +774,7 @@ python scripts\release_check.py
 
 - Confirm the release version in [pyproject.toml](pyproject.toml).
 - Run [Release Checklist](docs/release-checklist.md).
-- Create a matching GitHub release tag, for example `v1.0.0rc1`.
+- Create a matching GitHub release tag, for example `v1.0.0rc2`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
 - Clean stale build artifacts, then build the wheel and source distribution.
@@ -791,7 +783,7 @@ python scripts\release_check.py
 
 ## Project Status
 
-Context Janitor is at `v1.0.0rc1`: the CLI, config shape, heuristic selector, fallback behavior,
+Context Janitor is at `v1.0.0rc2`: the CLI, config shape, heuristic selector, fallback behavior,
 cache path, MCP proxy, eval tooling, and packaging flow are release-candidate ready. Before the
 final `v1.0.0` release, the remaining validation target is real-world testing against external tool
 catalogs and at least one real-log eval pack.
