@@ -1,0 +1,22 @@
+{
+  "capabilities": {
+    "tools": [
+      {
+        "name": "xquik_search_posts",
+        "description": "Search X posts and replies with filters for keywords, accounts, date windows, and result limits."
+      },
+      {
+        "name": "xquik_profile_lookup",
+        "description": "Look up public X profile metadata and account context for source review."
+      },
+      {
+        "name": "xquik_monitor_timeline",
+        "description": "Monitor X accounts or keywords and return recent social media activity for agent workflows."
+      },
+      {
+        "name": "xquik_create_draft_post",
+        "description": "Create an approval-gated X post draft that a human can review before publishing."
+      }
+    ]
+  }
+}

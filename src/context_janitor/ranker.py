@@ -59,9 +59,14 @@ PROMPT_ALIASES = {
     "pr": ("pull", "request"),
     "pricing": ("web", "search", "current"),
     "slot": ("availability", "calendar", "slots"),
+    "social": ("posts", "followers", "timeline", "monitor"),
     "schedule": ("calendar", "event"),
     "sql": ("postgres", "query"),
+    "tweet": ("twitter", "x", "post"),
+    "tweets": ("twitter", "x", "posts"),
+    "twitter": ("x", "tweet", "social"),
     "warehouse": ("bigquery", "analytics", "query", "reports", "dashboards"),
+    "x": ("twitter", "tweet", "social"),
 }
 
 

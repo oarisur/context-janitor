@@ -27,6 +27,23 @@ class LoadToolsTest(unittest.TestCase):
         self.assertEqual(tools[0].name, "web_search")
         self.assertEqual(raw_tools(tools), payload)
 
+    def test_load_tools_accepts_capabilities_tool_wrappers(self):
+        payload = {
+            "capabilities": {
+                "tools": [
+                    {
+                        "name": "xquik_search_posts",
+                        "description": "Search X posts and replies for social media monitoring.",
+                    }
+                ]
+            }
+        }
+
+        tools = load_tools(payload)
+
+        self.assertEqual(tools[0].name, "xquik_search_posts")
+        self.assertIn("social media", tools[0].description)
+
     def test_load_tools_requires_names(self):
         with self.assertRaisesRegex(ValueError, "missing"):
             load_tools([{"description": "No name"}])

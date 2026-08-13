@@ -260,6 +260,21 @@ Object wrappers are also accepted:
 }
 ```
 
+MCP-style capability wrappers are accepted too:
+
+```json
+{
+  "capabilities": {
+    "tools": [
+      { "name": "xquik_search_posts", "description": "Search X posts and replies." }
+    ]
+  }
+}
+```
+
+See `examples/xquik_mcp_tools.json` for a social-media MCP catalog fixture that exercises
+Xquik-style search, monitoring, profile, and posting tools.
+
 ## Selection Providers
 
 Context Janitor supports four provider values:

@@ -22,8 +22,16 @@ def load_tools(payload: Any) -> list[Tool]:
             payload = payload["tools"]
         elif isinstance(payload.get("functions"), list):
             payload = payload["functions"]
+        elif (
+            isinstance(payload.get("capabilities"), dict)
+            and isinstance(payload["capabilities"].get("tools"), list)
+        ):
+            payload = payload["capabilities"]["tools"]
         else:
-            raise ValueError("Expected a list of tools, or an object with a 'tools' list.")
+            raise ValueError(
+                "Expected a list of tools, or an object with a 'tools', 'functions', or "
+                "'capabilities.tools' list."
+            )
 
     if not isinstance(payload, list):
         raise ValueError("Expected tools JSON to be a list.")

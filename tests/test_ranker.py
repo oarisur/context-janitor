@@ -48,6 +48,17 @@ class SelectToolsTest(unittest.TestCase):
 
         self.assertEqual([tool.name for tool in selected], ["s3_upload_file"])
 
+    def test_select_tools_expands_social_and_x_intent_aliases(self):
+        tools = [
+            Tool("web_search", "Search the public web for current information."),
+            Tool("xquik_search_posts", "Search X posts, replies, profiles, and social timelines."),
+            Tool("gmail_send_email", "Send an email message to one or more recipients."),
+        ]
+
+        selected = select_tools("Find tweets about launch feedback", tools, limit=1)
+
+        self.assertEqual([tool.name for tool in selected], ["xquik_search_posts"])
+
 
 if __name__ == "__main__":
     unittest.main()
