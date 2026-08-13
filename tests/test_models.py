@@ -48,5 +48,6 @@ class LoadToolsTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing"):
             load_tools([{"description": "No name"}])
 
+
 if __name__ == "__main__":
     unittest.main()
