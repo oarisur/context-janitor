@@ -44,7 +44,12 @@ class SelectToolsTest(unittest.TestCase):
             "storage": ("s3", "bucket", "upload"),
         }
 
-        selected = select_tools("backup archive needs to go into ops storage", tools, limit=1, prompt_aliases=aliases)
+        selected = select_tools(
+            "backup archive needs to go into ops storage",
+            tools,
+            limit=1,
+            prompt_aliases=aliases,
+        )
 
         self.assertEqual([tool.name for tool in selected], ["s3_upload_file"])
 
