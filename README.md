@@ -2,7 +2,7 @@
 
 **Prune oversized LLM tool catalogs before they reach your agent, with local fallback and zero router cost by default.**
 
-![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc4/assets/terminal-demo.svg)
+![Context Janitor terminal demo](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc5/assets/terminal-demo.svg)
 
 Context Janitor is a dependency-free CLI and Python library for pruning oversized LLM tool
 catalogs. Give it a user prompt and a JSON list of tools, and it returns only the tools the agent
@@ -319,7 +319,7 @@ The local selector is not just a keyword set. It is a compact TF-IDF-style ranke
 - Weighs rare terms more heavily with inverse document frequency
 - Adds a small bonus for longer substring matches
 
-![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc4/assets/heuristic-flow.svg)
+![Context Janitor heuristic flow](https://raw.githubusercontent.com/oarisur/context-janitor/v1.0.0rc5/assets/heuristic-flow.svg)
 
 Distinctive terms like `stripe`, `github`, `postgres`, or `pdf` usually beat generic words like
 `create`, `get`, or `send`.
@@ -817,7 +817,7 @@ python scripts\release_check.py
 
 - Confirm the release version in [pyproject.toml](pyproject.toml).
 - Run [Release Checklist](docs/release-checklist.md).
-- Create a matching GitHub release tag, for example `v1.0.0rc4`.
+- Create a matching GitHub release tag, for example `v1.0.0rc5`.
 - Run the tests and benchmark.
 - Run thresholded selection and agent-success evals.
 - Clean stale build artifacts, then build the wheel and source distribution.
@@ -826,7 +826,7 @@ python scripts\release_check.py
 
 ## Project Status
 
-Context Janitor is at `v1.0.0rc4`: the CLI, config shape, heuristic selector, fallback behavior,
+Context Janitor is at `v1.0.0rc5`: the CLI, config shape, heuristic selector, fallback behavior,
 cache path, MCP proxy, eval tooling, and packaging flow are ready for final release-candidate
 validation. Before the final `v1.0.0` release, the remaining validation target is real-world testing
 against external tool catalogs and at least one real-log eval pack.

@@ -36,7 +36,7 @@ Manual release tasks:
 - Confirm README asset URLs point at the release tag being published
 - Remove stale `dist/` and `build/` artifacts before building a publishable package
 - Upload only the artifacts for the current version, not every file in `dist/`
-- Create a matching Git tag, such as `v1.0.0rc4`
+- Create a matching Git tag, such as `v1.0.0rc5`
 - Confirm the Git tag includes all README-referenced assets before publishing the GitHub Release
 - For Trusted Publishing, configure PyPI to trust `.github/workflows/publish.yml` with the
   `pypi` GitHub environment, then publish from a GitHub Release.
